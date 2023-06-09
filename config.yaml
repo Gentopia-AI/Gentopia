@@ -1,0 +1,25 @@
+name: example
+version: 0.0.1
+description: example
+
+agents:
+  - solver: !include solver.yaml
+  - planner:
+    name: GPT4
+    version: 0.0.1
+    description: example
+    config:
+      temperature: 0.1
+      api_key: example
+      token_limit: 1000
+      prompt: example
+  - worker:
+    - name: Google
+      description: Worker that searches results from Google.
+      config:
+        max_length: 10
+    - name: WolfAlpha
+      description: Worker that searches results from WolfAlpha.
+      config:
+        api_key: example
+
