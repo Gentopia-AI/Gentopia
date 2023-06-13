@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Generator
-
+from pydantic import BaseModel
 from gentopia.model.completion_model import BaseCompletion, ChatCompletion
 from gentopia.model.param_model import BaseParamModel
 
 
-class BaseLLM(ABC):
+class BaseLLM(ABC, BaseModel):
+
+    model_name: str
+    model_description: str
+    model_param: BaseParamModel
 
     @abstractmethod
     def get_model_name(self) -> str:
