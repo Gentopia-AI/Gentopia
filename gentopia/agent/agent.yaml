@@ -1,4 +1,5 @@
 name: Test
+type: ReWoo
 tools:
   - Google
   - Wikipedia:

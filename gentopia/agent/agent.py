@@ -1,9 +1,5 @@
 import re
-from datetime import time
 from typing import AnyStr
-
-from gentopia.agent.parser import parse_plans, parse_planner_evidences
-from gentopia.util.util import get_token_unit_price
 
 
 class Agent:
@@ -17,58 +13,11 @@ class Agent:
         self.planner_evidences = {}
         self.worker_evidences = {}
         self.tool_counter = {}
-        self.planner_token_unit_price = get_token_unit_price(planner.model_name)
-        self.solver_token_unit_price = get_token_unit_price(solver.model_name)
-        self.tool_token_unit_price = get_token_unit_price("text-davinci-003")
-        self.google_unit_price = 0.01
+
 
     def run(self, input):
         # run is stateless, so we need to reset the evidences
-        self._reinitialize()
-        result = {}
-        st = time.time()
-        # Plan
-        planner_response = self.planner.run(input, log=True)
-        plan = planner_response["output"]
-        planner_log = planner_response["input"] + planner_response["output"]
-        self.plans = parse_plans(plan)
-        self.planner_evidences, self.evidences_level = parse_planner_evidences(plan)
-
-        # Work
-        self._get_worker_evidences()
-        worker_log = ""
-        for i in range(len(self.plans)):
-            e = f"#E{i + 1}"
-            worker_log += f"{self.plans[i]}\nEvidence:\n{self.worker_evidences[e]}\n"
-
-        # Solve
-        solver_response = self.solver.run(input, worker_log, log=True)
-        output = solver_response["output"]
-        solver_log = solver_response["input"] + solver_response["output"]
-
-        result["wall_time"] = time.time() - st
-        result["input"] = input
-        result["output"] = output
-        result["planner_log"] = planner_log
-        result["worker_log"] = worker_log
-        result["solver_log"] = solver_log
-        result["tool_usage"] = self.tool_counter
-        result["steps"] = len(self.plans) + 1
-        result["total_tokens"] = planner_response["prompt_tokens"] + planner_response["completion_tokens"] \
-                                 + solver_response["prompt_tokens"] + solver_response["completion_tokens"] \
-                                 + self.tool_counter.get("LLM_token", 0) \
-                                 + self.tool_counter.get("Calculator_token", 0)
-        result["token_cost"] = self.planner_token_unit_price * (
-                planner_response["prompt_tokens"] + planner_response["completion_tokens"]) \
-                               + self.solver_token_unit_price * (
-                                       solver_response["prompt_tokens"] + solver_response["completion_tokens"]) \
-                               + self.tool_token_unit_price * (
-                                       self.tool_counter.get("LLM_token", 0) + self.tool_counter.get(
-                                   "Calculator_token", 0))
-        result["tool_cost"] = self.tool_counter.get("Google", 0) * self.google_unit_price
-        result["total_cost"] = result["token_cost"] + result["tool_cost"]
-
-        return result
+        raise NotImplementedError
 
     # use planner evidences to assign tasks to respective workers.
     def _get_worker_evidences(self):
