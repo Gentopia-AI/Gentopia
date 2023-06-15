@@ -1,10 +1,8 @@
-import logging
 from typing import List, Union
 
 from pydantic import BaseModel
 
 from gentopia.llm.base_llm import BaseLLM
-from gentopia.llm.llm_info import *
 from gentopia.model.completion_model import BaseCompletion
 from gentopia.prompt.rewoo import *
 
@@ -13,7 +11,7 @@ class Solver(BaseModel):
     model: BaseLLM
     prompt_template: PromptTemplate = None
     examples: Union[str, List[str]] = None
-    logger = logging.getLogger('application')
+    # logger = logging.getLogger('application')
 
     def _compose_fewshot_prompt(self) -> str:
         if self.examples is None:
