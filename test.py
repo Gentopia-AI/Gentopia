@@ -1,5 +1,4 @@
-from langchain.prompts import HumanMessagePromptTemplate, MessagesPlaceholder, ChatPromptTemplate
-from langchain.schema import SystemMessage
+import logging
 
 #
 # x = Config.load("gentopia/agent/agent.yaml")
@@ -15,11 +14,4 @@ from langchain.schema import SystemMessage
 # print(x)
 
 if __name__ == '__main__':
-    messages = [
-        SystemMessage(content="You are a helpful AI assistant."),
-        HumanMessagePromptTemplate.from_template("{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ]
-    input_variables = ["input", "agent_scratchpad"]
-    x = ChatPromptTemplate(input_variables=input_variables, messages=messages)
-    print(x.to_messages())
+    logging.warning("123")

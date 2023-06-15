@@ -18,7 +18,7 @@ FINAL_ANSWER_ACTION = "Final Answer:"
 
 class ReactAgent(BaseAgent):
     name: str = "ReactAgent"
-    type: AgentType = AgentType.REWOO
+    type: AgentType = AgentType.REACT
     version: str
     description: str
     target_tasks: list[str]
