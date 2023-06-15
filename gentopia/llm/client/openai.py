@@ -1,10 +1,12 @@
+import os
+from typing import List
+
+import openai
+
 from gentopia.llm.base_llm import BaseLLM
+from gentopia.llm.llm_info import *
 from gentopia.model.completion_model import *
 from gentopia.model.param_model import *
-from gentopia.llm.llm_info import *
-from typing import List
-import openai
-import os
 
 
 class OpenAIGPTClient(BaseLLM):
@@ -22,7 +24,7 @@ class OpenAIGPTClient(BaseLLM):
     def get_model_param(self):
         return self.params
 
-    def completion(self, prompt: str):
+    def completion(self, prompt: str, **kwargs):
         try:
             response = openai.ChatCompletion.create(
                 n=self.params.n,
@@ -33,6 +35,7 @@ class OpenAIGPTClient(BaseLLM):
                 top_p=self.params.top_p,
                 frequency_penalty=self.params.frequency_penalty,
                 presence_penalty=self.params.presence_penalty,
+                **kwargs
             )
             return BaseCompletion(state="success",
                                   content=response.choices[0].message["content"],
