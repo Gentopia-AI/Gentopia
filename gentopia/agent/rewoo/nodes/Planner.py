@@ -1,4 +1,3 @@
-import logging
 from typing import List, Union
 
 from langchain.tools import BaseTool
@@ -6,7 +5,6 @@ from pydantic import BaseModel
 
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.llm.base_llm import BaseLLM
-from gentopia.llm.llm_info import *
 from gentopia.model.completion_model import BaseCompletion
 from gentopia.prompt.rewoo import *
 
@@ -16,7 +14,7 @@ class Planner(BaseModel):
     prompt_template: PromptTemplate = None
     examples: Union[str, List[str]] = None
     workers: List[Union[BaseTool, BaseAgent]]
-    logger = logging.getLogger('application')
+    # logger = logging.getLogger('application')
 
     def _compose_worker_description(self) -> str:
         """
