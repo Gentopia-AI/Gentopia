@@ -17,3 +17,4 @@ class OpenAIParamModel(BaseParamModel):
     frequency_penalty: float = 0.0
     n: int = 1
     stop: list = []
+
