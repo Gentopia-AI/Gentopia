@@ -10,3 +10,13 @@ CORE FEATURES.
 - At wiring time, Gentopia is fully config-driven, thereby should provide a config parser to set up the whole graph. 
 - The Agent class should follow ReWOO architecture
 - The CoreAgent class should follow ReAct architecture
+
+
+# RoadMap 📌
+- [ ] Infra of Gentopia, GentPool and GentBench.
+- [ ] First assemble and run.
+- [ ] First specialized / optimized agent.
+- [ ] First benchmark eval of the agent.
+- [ ] Wiki page ramp up.
+- [ ] UX and app ramp up.
+- [ ] Documentation.
