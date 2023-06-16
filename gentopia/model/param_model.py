@@ -34,7 +34,7 @@ class HuggingfaceLoaderModel(BaseModel):
 
     @property
     def device_map(self) -> Union[Dict[str, str], str]:
-        device = {"", self.device}
+        device = {"": self.device}
         if self.device.startswith("gpu"):
             device = "auto"
         return device
