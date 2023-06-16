@@ -8,7 +8,7 @@ from gentopia.model.param_model import HuggingfaceLoaderModel
 
 def load_model(loader_model: HuggingfaceLoaderModel):
     tokenizer = LlamaTokenizer.from_pretrained(loader_model.base_url)
-    tokenizer.pad_token_id = 1
+    tokenizer.bos_token_id = 1
     tokenizer.padding_side = "left"
     args, kwargs = loader_model.default_args
     model = AutoModelForCausalLM.from_pretrained(*args, **kwargs)
