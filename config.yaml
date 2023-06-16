@@ -1,25 +1,86 @@
-name: example
+name: main
 version: 0.0.1
 description: example
+type: rewoo
+prompt_template:
+  - Planner:
+      input_variables:
+       - foo
+      template: "Say {foo}"
+  - Solver:
+      input_variables:
+       - foo
+      template: "Say {foo}"
+llm:
+  - Planner:
+      name: llm
+      description: 111
+      model_param:
+        model_name: 123
+      model_name: 111123
+  - Solver:
+      name: llm
+      description: 122223
+      model_param:
+        model_name: 123
+      model_name: 123
+target_tasks:
+ - print
+ - find
 
-agents:
-  - solver: !include solver.yaml
-  - planner:
-    name: GPT4
-    version: 0.0.1
-    description: example
-    config:
-      temperature: 0.1
-      api_key: example
-      token_limit: 1000
-      prompt: example
-  - worker:
-    - name: Google
-      description: Worker that searches results from Google.
-      config:
-        max_length: 10
-    - name: WolfAlpha
-      description: Worker that searches results from WolfAlpha.
-      config:
-        api_key: example
+plugins:
+   -  name: main
+      version: 0.0.1
+      description: example
+      type: rewoo
+      prompt_template:
+        - Planner:
+            input_variables:
+             - foo
+            template: "Say {foo}"
+        - Solver:
+            input_variables:
+             - foo
+            template: "Say {foo}"
+      llm:
+        - Planner:
+            name: llm
+            description: 111
+            model_param:
+              model_name: 123
+            model_name: 111123
+        - Solver:
+            name: llm
+            description: 122223
+            model_param:
+              model_name: 123
+            model_name: 123
+
+##  - !include: ./plugins/React/React-Router.js
+##  - !include: ./plugins/React/React-Redux.js
+#  - name: React-Router
+#    type: rewoo
+#    version: 0.0.1
+#    description: example
+#    prompt_template:
+#      input_variables:
+#       - foo
+#      template: "Say {foo}"
+#    llm:
+##      - Planner:
+#        name: llm
+#        description: 111
+#        model_param:
+#          model_name: 123
+#        model_name: 111123
+##      - Solver:
+##          name: llm
+##          description: 122223
+##          model_param:
+##            model_name: 123
+##          model_name: 123
+##    plugins:
+##      - !include: ./plugins/React/React-Router.js
+
+
 

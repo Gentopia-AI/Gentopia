@@ -24,7 +24,7 @@ class RewooAgent(BaseAgent):
     prompt_template: Dict[str, PromptTemplate]  # {"Planner": xxx, "Solver": xxx}
     plugins: List[Union[BaseTool, BaseAgent]]
     examples: Dict[str, Union[str, List[str]]] = None
-    logger = logging.getLogger('application')
+    # logger = logging.getLogger('application')
 
     def _get_llms(self):
         if isinstance(self.llm, BaseLLM):
@@ -72,9 +72,8 @@ class RewooAgent(BaseAgent):
         Example:
             {"*E1": "Tool1", "*E2": "Tool2", "*E3": "Tool3", "*E4": "Tool4"}, [[*E1, *E2], [*E3, *E4]]
         """
-        evidences = dict()
+        evidences, dependence = dict(), dict()
         num = 0
-        dependence = dict()
         for line in planner_response.splitlines():
             if line.startswith("*E") and line[2].isdigit():
                 e, tool_call = line.split(":", 1)
