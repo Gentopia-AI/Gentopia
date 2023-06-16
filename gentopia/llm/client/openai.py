@@ -18,13 +18,13 @@ class OpenAIGPTClient(BaseLLM):
         if api_key is not None:
             openai.api_key = api_key
 
-    def get_model_name(self):
+    def get_model_name(self) -> str:
         return self.params.model
 
-    def get_model_param(self):
+    def get_model_param(self) -> OpenAIParamModel:
         return self.params
 
-    def completion(self, prompt: str, **kwargs):
+    def completion(self, prompt: str, **kwargs) -> BaseCompletion:
         try:
             response = openai.ChatCompletion.create(
                 n=self.params.n,
@@ -45,7 +45,7 @@ class OpenAIGPTClient(BaseLLM):
             print("Exception:", exception)
             return BaseCompletion(state="error", content=exception)
 
-    def chat_completion(self, message: List[dict]):
+    def chat_completion(self, message: List[dict]) -> ChatCompletion:
         try:
             response = openai.ChatCompletion.create(
                 n=self.params.n,
@@ -67,4 +67,5 @@ class OpenAIGPTClient(BaseLLM):
             return ChatCompletion(state="error", content=exception)
 
     def stream_chat_completion(self, prompt: str):
+        # TODO: Implement stream_chat_completion
         raise NotImplementedError("TO BE IMPLEMENTED")

@@ -2,34 +2,27 @@ import torch
 from optimum.bettertransformer import BetterTransformer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from gentopia.model.param_model import HuggingfaceLoaderModel
 
-def load_model(
-        base,
-        finetuned,
-        mode_cpu,
-        mode_mps,
-        mode_full_gpu,
-        mode_8bit,
-        mode_4bit,
-        force_download_ckpt
-):
-    tokenizer = AutoTokenizer.from_pretrained(base)
+
+def load_model(loader_model: HuggingfaceLoaderModel):
+    tokenizer = AutoTokenizer.from_pretrained(loader_model.base_url)
     tokenizer.pad_token_id = 1
     tokenizer.eos_token_id = 0
     tokenizer.padding_side = "left"
 
-    if mode_cpu:
+    if loader_model.device == "cpu":
         print("cpu mode")
         model = AutoModelForCausalLM.from_pretrained(
-            base,
+            loader_model.base_url,
             device_map={"": "cpu"},
             use_safetensors=False,
         )
 
-    elif mode_mps:
+    elif loader_model.device == "mps":
         print("mps mode")
         model = AutoModelForCausalLM.from_pretrained(
-            base,
+            loader_model.base_url,
             device_map={"": "mps"},
             torch_dtype=torch.float16,
             use_safetensors=False,
@@ -37,17 +30,16 @@ def load_model(
 
     else:
         print("gpu mode")
-        print(f"8bit = {mode_8bit}, 4bit = {mode_4bit}")
         model = AutoModelForCausalLM.from_pretrained(
-            base,
-            load_in_8bit=mode_8bit,
-            load_in_4bit=mode_4bit,
+            loader_model.base_url,
+            load_in_8bit=True if loader_model.device == "gpu-8bit" else False,
+            load_in_4bit=True if loader_model.device == "gpu-4bit" else False,
             device_map="auto",
             torch_dtype=torch.float16,
             use_safetensors=False,
         )
 
-        if not mode_8bit and not mode_4bit:
+        if loader_model.device == "gpu":
             model.half()
 
     model = BetterTransformer.transform(model)

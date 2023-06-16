@@ -2,35 +2,25 @@ import torch
 from peft import PeftModel
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+from gentopia.model.param_model import HuggingfaceLoaderModel
 
-def load_model(
-        base,
-        finetuned,
-        mode_cpu,
-        mode_mps,
-        mode_full_gpu,
-        mode_8bit,
-        mode_4bit,
-        force_download_ckpt
-):
-    tokenizer = AutoTokenizer.from_pretrained(
-        base, trust_remote_code=True)
+
+def load_model(loader_model: HuggingfaceLoaderModel):
+    tokenizer = AutoTokenizer.from_pretrained(loader_model.base_url, trust_remote_code=True)
     tokenizer.padding_side = "left"
 
     model = AutoModelForCausalLM.from_pretrained(
-        base,
-        load_in_8bit=mode_8bit,
-        load_in_4bit=mode_4bit,
+        loader_model.base_url,
+        load_in_8bit=True if loader_model.device == "gpu-8bit" else False,
+        load_in_4bit=True if loader_model.device == "gpu-4bit" else False,
         torch_dtype=torch.bfloat16,
         trust_remote_code=True,
     )
 
-    if finetuned is not None and \
-            finetuned != "" and \
-            finetuned != "N/A":
+    if loader_model.ckpt_url:
         model = PeftModel.from_pretrained(
             model,
-            finetuned,
+            loader_model.ckpt_url,
             # force_download=force_download_ckpt,
             trust_remote_code=True
         )
