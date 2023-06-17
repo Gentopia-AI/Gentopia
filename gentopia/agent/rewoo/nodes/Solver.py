@@ -28,7 +28,10 @@ class Solver(BaseModel):
         """
         fewshot = self._compose_fewshot_prompt()
         if self.prompt_template is not None:
-            return self.prompt_template.format(plan_evidence=plan_evidence, fewshot=fewshot, task=instruction)
+            if "fewshot" in self.prompt_template.input_variables:
+                return self.prompt_template.format(plan_evidence=plan_evidence, fewshot=fewshot, task=instruction)
+            else:
+                return self.prompt_template.format(plan_evidence=plan_evidence, task=instruction)
         else:
             if self.examples is not None:
                 return FewShotSolverPrompt.format(plan_evidence=plan_evidence, fewshot=fewshot, task=instruction)
