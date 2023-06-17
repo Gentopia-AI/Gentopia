@@ -23,7 +23,7 @@ class RewooAgent(BaseAgent):
     llm: Union[BaseLLM, Dict[str, BaseLLM]]  # {"Planner": xxx, "Solver": xxx}
     prompt_template: Dict[str, PromptTemplate]  # {"Planner": xxx, "Solver": xxx}
     plugins: List[Union[BaseTool, BaseAgent]]
-    examples: Dict[str, Union[str, List[str]]] = None
+    examples: Dict[str, Union[str, List[str]]] = dict()
     # logger = logging.getLogger('application')
 
     def _get_llms(self):

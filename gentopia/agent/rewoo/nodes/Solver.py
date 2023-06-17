@@ -1,3 +1,4 @@
+import logging
 from typing import List, Union
 
 from pydantic import BaseModel
@@ -35,12 +36,12 @@ class Solver(BaseModel):
                 return ZeroShotSolverPrompt.format(plan_evidence=plan_evidence, task=instruction)
 
     def run(self, instruction: str, plan_evidence: str) -> BaseCompletion:
-        self.logger.info("Running Solver")
+        logging.info("Running Solver")
         prompt = self._compose_prompt(instruction, plan_evidence)
         response = self.model.completion(prompt)
         if response.state == "error":
-            self.logger.error("Solver failed to retrieve response from LLM")
+            logging.error("Solver failed to retrieve response from LLM")
         else:
-            self.logger.info(f"Solver run successful.")
+            logging.info(f"Solver run successful.")
 
             return response

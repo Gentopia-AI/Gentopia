@@ -76,6 +76,8 @@ class AgentConfig:
 
     def parse_prompt_template(self, obj):
         assert isinstance(obj, dict)
+        if 'prompt' in obj:
+            return obj['prompt']
         input_variables = obj['input_variables']
         template = obj['template']
         template_format = obj.get('template_format', 'f-string')

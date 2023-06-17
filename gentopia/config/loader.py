@@ -9,6 +9,7 @@ class Loader(yaml.SafeLoader):
         self._root = Path(stream.name).resolve().parent
         super(Loader, self).__init__(stream)
         self.add_constructor("!include", Loader.include)
+        self.add_constructor("!prompt", Loader.prompt)
 
     def include(self, node: yaml.Node) -> Any:
         filename = Path(self.construct_scalar(node))
@@ -16,3 +17,7 @@ class Loader(yaml.SafeLoader):
             filename = self._root / filename
         with open(filename, 'r') as f:
             return yaml.load(f, Loader)
+
+    def prompt(self, node: yaml.Node) -> Any:
+        prompt = self.construct_scalar(node)
+        return eval(prompt)
