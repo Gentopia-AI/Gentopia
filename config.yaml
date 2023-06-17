@@ -13,22 +13,19 @@ prompt_template:
       template: "Say {foo}"
 llm:
   - Planner:
-      name: llm
+      name: guanaco
       description: 111
-      model_param:
-        model_name: 123
       model_name: 111123
   - Solver:
-      name: llm
+      name: guanaco
       description: 122223
-      model_param:
-        model_name: 123
       model_name: 123
 target_tasks:
  - print
  - find
 
 plugins:
+   -  !include config2.yaml
    -  name: main
       version: 0.0.1
       description: example
@@ -44,43 +41,21 @@ plugins:
             template: "Say {foo}"
       llm:
         - Planner:
-            name: llm
-            description: 111
-            model_param:
-              model_name: 123
-            model_name: 111123
-        - Solver:
-            name: llm
-            description: 122223
-            model_param:
-              model_name: 123
+            name: guanaco
             model_name: 123
-
-##  - !include: ./plugins/React/React-Router.js
-##  - !include: ./plugins/React/React-Redux.js
-#  - name: React-Router
-#    type: rewoo
-#    version: 0.0.1
-#    description: example
-#    prompt_template:
-#      input_variables:
-#       - foo
-#      template: "Say {foo}"
-#    llm:
-##      - Planner:
-#        name: llm
-#        description: 111
-#        model_param:
-#          model_name: 123
-#        model_name: 111123
-##      - Solver:
-##          name: llm
-##          description: 122223
-##          model_param:
-##            model_name: 123
-##          model_name: 123
-##    plugins:
-##      - !include: ./plugins/React/React-Router.js
-
-
+            description: 111123
+        - Solver:
+            name: guanaco
+            model_name: 123
+            description: 123
+      plugins:
+        - name: cal
+          version: 0.0.1
+          description: example
+          type: calculator
+   -  name: wiki
+      version: 0.0.1
+      description: example
+      type: wikipedia
+   -  name: cal
 

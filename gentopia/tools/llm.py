@@ -12,7 +12,7 @@ class LLM(BaseTool):
                   "knowledge and common sense. Prioritize it when you are confident in solving the problem " \
                   "yourself. Input can be any instruction."
 
-    args_schema = create_model("LLMArgs", text=(str, ...))
+    args_schema: Optional[Type[BaseModel]] = create_model("LLMArgs", text=(str, ...))
 
     def _run(self, text: AnyStr) -> AnyStr:
         llm = OpenAI(temperature=0)

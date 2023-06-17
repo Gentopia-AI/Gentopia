@@ -24,11 +24,11 @@ class CustomWolframAlphaAPITool(WolframAlphaAPIWrapper):
             return f"Answer: {answer}"
 
 
-class WolframAlphaWorker(BaseTool):
+class WolframAlpha(BaseTool):
     name = "wolfram_alpha"
     description = "A WolframAlpha search engine. Useful when you need to solve a complicated Mathematical or " \
                   "Algebraic equation. Input should be an equation or function."
-    args_schema = create_model("WolframAlphaArgs", query=(str, ...))
+    args_schema: Optional[Type[BaseModel]] = create_model("WolframAlphaArgs", query=(str, ...))
 
     def _run(self, query: AnyStr) -> AnyStr:
         tool = CustomWolframAlphaAPITool()

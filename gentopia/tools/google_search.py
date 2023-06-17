@@ -12,7 +12,7 @@ class GoogleSearch(BaseTool):
     description = "Worker that searches results from Google. Useful when you need to find short " \
                   "and succinct answers about a specific topic. Input should be a search query."
 
-    args_schema = create_model("GoogleSearchArgs", query=(str, ...))
+    args_schema: Optional[Type[BaseModel]] = create_model("GoogleSearchArgs", query=(str, ...))
 
     def _run(self, query: AnyStr) -> AnyStr:
         tool = SerpAPIWrapper()

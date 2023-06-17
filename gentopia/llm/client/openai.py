@@ -10,16 +10,17 @@ from gentopia.model.param_model import *
 
 
 class OpenAIGPTClient(BaseLLM):
-    def __init__(self, params: OpenAIParamModel, api_key: str = None):
-        assert TYPES.get(params.model_name, None) == "OpenAI"
+    def __init__(self, model_name: str, params: OpenAIParamModel, api_key: str = None):
+        assert TYPES.get(model_name, None) == "OpenAI"
         self.api_key = api_key
         self.params = params
+        self.model_name = model_name
         openai.api_key = os.environ.get("OPENAI_API_KEY", "")
         if api_key is not None:
             openai.api_key = api_key
 
     def get_model_name(self) -> str:
-        return self.params.model
+        return self.model_name
 
     def get_model_param(self) -> OpenAIParamModel:
         return self.params
@@ -28,7 +29,7 @@ class OpenAIGPTClient(BaseLLM):
         try:
             response = openai.ChatCompletion.create(
                 n=self.params.n,
-                model=self.params.model_name,
+                model=self.model_name,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=self.params.temperature,
                 max_tokens=self.params.max_tokens,
@@ -49,7 +50,7 @@ class OpenAIGPTClient(BaseLLM):
         try:
             response = openai.ChatCompletion.create(
                 n=self.params.n,
-                model=self.params.model_name,
+                model=self.model_name,
                 messages=message,
                 temperature=self.params.temperature,
                 max_tokens=self.params.max_tokens,

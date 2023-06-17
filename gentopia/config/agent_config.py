@@ -1,12 +1,16 @@
-from typing import List, Union, Dict
+from typing import Union, Dict
 
 from langchain import PromptTemplate
 
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.config.config import Config
+from gentopia.llm import HuggingfaceLLMClient, OpenAIGPTClient
 from gentopia.llm.base_llm import BaseLLM
-from gentopia.llm.tmp_llm import TmpLLM
+from gentopia.llm.llm_info import TYPES
 from gentopia.model.agent_model import AgentType
+from gentopia.model.param_model import OpenAIParamModel, HuggingfaceParamModel
+from gentopia.tools import *
+from gentopia.tools import BaseTool
 
 
 class AgentConfig:
@@ -16,7 +20,7 @@ class AgentConfig:
         elif config is not None:
             self.config = Config.from_dict(config)
 
-        self.plugins: Dict[Union[BaseAgent, List]] = []
+        self.plugins: Dict[str, Union[BaseAgent, BaseTool]] = dict()
 
     def get_agent(self, config=None):
         if config is None:
@@ -51,9 +55,14 @@ class AgentConfig:
 
     def parse_llm(self, obj) -> BaseLLM:
         name = obj['name']
-        description = obj['description']
-        model_param = obj['model_param']
-        return TmpLLM(model_name=name, model_description=description, model_param=model_param)
+        model_param = obj.get('model_param', dict())
+        if TYPES.get(name, None) == "OpenAI":
+            key = obj.get('key', None)
+            params = OpenAIParamModel(**model_param)
+            return OpenAIGPTClient(model_name=name, params=params, api_key=key)
+        device = obj.get('device', 'cpu')
+        params = HuggingfaceParamModel(**model_param)
+        return HuggingfaceLLMClient(model_name=name, model_param=params, device=device)
 
     def get_prompt_template(self, obj):
         assert isinstance(obj, dict) or isinstance(obj, list)
@@ -74,15 +83,22 @@ class AgentConfig:
         return PromptTemplate(input_variables=input_variables, template=template, template_format=template_format,
                               validate_template=validate_template)
 
+
     def parse_plugins(self, obj):
         assert isinstance(obj, list)
         result = []
         for i in obj:
-            if i['type'] != 'tool':
+            if i['name'] in self.plugins:
+                _plugin = self.plugins[i['name']]
+                result.append(_plugin)
+                continue
+            if 'llm' in i:
                 agent = self.get_agent(i)
                 result.append(agent)
                 self.plugins[i['name']] = agent
             else:
-                pass
-                # TODO: load tools
+                params = i.get('tool_param', dict())
+                tool = load_tools(i['type'])(**params)
+                result.append(tool)
+                self.plugins[i['name']] = tool
         return result

@@ -1,17 +1,28 @@
-import logging
+from gentopia.config.agent_config import AgentConfig
 
-#
-# x = Config.load("gentopia/agent/agent.yaml")
-# print(x)
-#
-# from gentopia.config.agent_config import AgentConfig
-#
-# x = AgentConfig("gentopia/agent/agent.yaml")
-# a = x.get_agent()
-# print(a)
-# print(a.tools.tools['Wikipedia'].description)
-# print(a.tools.generate_worker_prompt())
-# print(x)
+
+def print_tree(obj, indent=0):
+    for attr in dir(obj):
+        if not attr.startswith('_'):
+            value = getattr(obj, attr)
+            if not callable(value):
+                if not isinstance(value, dict) and not isinstance(value, list):
+                    print('|   ' * indent + '|--', f'{attr}: {value}')
+                else:
+                    if not value:
+                        print('|   ' * indent + '|--', f'{attr}: {value}')
+                    print('|   ' * indent + '|--', f'{attr}:')
+                if hasattr(value, '__dict__'):
+                    print_tree(value, indent + 1)
+                elif isinstance(value, list):
+                    for item in value:
+                        print_tree(item, indent + 1)
+                elif isinstance(value, dict):
+                    for key, item in value.items():
+                        print_tree(item, indent + 1)
+
 
 if __name__ == '__main__':
-    logging.warning("123")
+    agent = AgentConfig(file='config.yaml').get_agent()
+    print(agent)
+    # print(agent.plugins)
