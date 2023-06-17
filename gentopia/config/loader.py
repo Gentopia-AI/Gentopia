@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Any, IO
-
+from gentopia.prompt import *
 import yaml
 
 
