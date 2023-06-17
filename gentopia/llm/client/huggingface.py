@@ -2,7 +2,6 @@ import json
 import os
 from typing import Generator
 
-import torch
 from pydantic import validator
 
 from gentopia.llm.base_llm import BaseLLM
@@ -45,6 +44,12 @@ class HuggingfaceLoader(BaseModel):
                                       ckpt_url=model_info.get("hub(ckpt)", ""),
                                       device=self.device)
 
+    def get_vram_usage(self):
+        model_info = model_data[self.model_name]
+        return {"half": model_info.get("vram(full)", ""),
+                "8bit": model_info.get("vram(8bit)", ""),
+                "4bit": model_info.get("vram(4bit)", "")}
+
     def load_model(self):
         """
         Map base url into mode loader.
@@ -54,7 +59,7 @@ class HuggingfaceLoader(BaseModel):
         if "airoboros" in self.model_name:
             from gentopia.llm.loaders.airoboros import load_model
             return load_model(model_info)
-        elif "alpaca" in self.model_name:
+        elif "alpaca" in self.model_name or "wizardlm" in self.model_name:
             from gentopia.llm.loaders.alpaca import load_model
             return load_model(model_info)
         elif "baize" in self.model_name:
