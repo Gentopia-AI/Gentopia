@@ -1,12 +1,13 @@
+import logging
 from typing import List, Union
 
-from langchain.tools import BaseTool
 from pydantic import BaseModel
 
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.completion_model import BaseCompletion
 from gentopia.prompt.rewoo import *
+from gentopia.tools import BaseTool
 
 
 class Planner(BaseModel):
@@ -47,22 +48,25 @@ class Planner(BaseModel):
         worker_desctription = self._compose_worker_description()
         fewshot = self._compose_fewshot_prompt()
         if self.prompt_template is not None:
-            return self.prompt_template.format(tool_description=worker_desctription, fewshot=fewshot, task=instruction)
+            if "fewshot" in self.prompt_template.input_variables:
+                return self.prompt_template.format(tool_description=worker_desctription, fewshot=fewshot,
+                                                   task=instruction)
+            else:
+                return self.prompt_template.format(tool_description=worker_desctription, task=instruction)
         else:
             if self.examples is not None:
-
                 return FewShotPlannerPrompt.format(tool_description=worker_desctription, fewshot=fewshot,
                                                    task=instruction)
             else:
                 return ZeroShotPlannerPrompt.format(tool_description=worker_desctription, task=instruction)
 
     def run(self, instruction: str) -> BaseCompletion:
-        self.logger.info("Running Planner")
+        logging.info("Running Planner")
         prompt = self._compose_prompt(instruction)
         response = self.model.completion(prompt)
         if response.state == "error":
-            self.logger.error("Planner failed to retrieve response from LLM")
+            logging.error("Planner failed to retrieve response from LLM")
             raise ValueError("Planner failed to retrieve response from LLM")
         else:
-            self.logger.info(f"Planner run successful.")
+            logging.info(f"Planner run successful.")
             return response

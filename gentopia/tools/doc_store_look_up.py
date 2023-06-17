@@ -9,11 +9,8 @@ class DocStoreLookUp(BaseTool):
     description = "Worker that search the direct sentence in current Wikipedia result page. Useful when you " \
                   "need to find information about a specific keyword from a existing Wikipedia search " \
                   "result. Input should be a search keyword."
-    args_schema = create_model("DocStoreLookUpArgs", query=(str, ...))
-
-    def __init__(self, doc_store=None):
-        super().__init__()
-        self.doc_store = doc_store
+    args_schema: Optional[Type[BaseModel]] = create_model("DocStoreLookUpArgs", query=(str, ...))
+    doc_store: Any = None
 
     def _run(self, query: AnyStr) -> AnyStr:
         assert self.doc_store is not None, "doc_store is not set"

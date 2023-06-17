@@ -3,13 +3,13 @@ import re
 from typing import List, Dict, Union
 
 from langchain import PromptTemplate
-from langchain.tools import BaseTool
 
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.agent.rewoo.nodes.Planner import Planner
 from gentopia.agent.rewoo.nodes.Solver import Solver
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType
+from gentopia.tools import BaseTool
 from gentopia.util.cost_helpers import *
 from gentopia.util.text_helpers import *
 
@@ -23,7 +23,7 @@ class RewooAgent(BaseAgent):
     llm: Union[BaseLLM, Dict[str, BaseLLM]]  # {"Planner": xxx, "Solver": xxx}
     prompt_template: Dict[str, PromptTemplate]  # {"Planner": xxx, "Solver": xxx}
     plugins: List[Union[BaseTool, BaseAgent]]
-    examples: Dict[str, Union[str, List[str]]] = None
+    examples: Dict[str, Union[str, List[str]]] = dict()
     # logger = logging.getLogger('application')
 
     def _get_llms(self):
@@ -169,3 +169,6 @@ class RewooAgent(BaseAgent):
         total_token += solver_output.prompt_token + solver_output.completion_token
 
         return AgentOutput(output=solver_output.content, cost=total_cost, token_usage=total_token)
+
+    def __str__(self):
+        return super().__str__()

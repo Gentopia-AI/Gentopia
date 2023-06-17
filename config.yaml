@@ -4,83 +4,29 @@ description: example
 type: rewoo
 prompt_template:
   - Planner:
-      input_variables:
-       - foo
-      template: "Say {foo}"
+      prompt: !prompt ZeroShotPlannerPrompt
   - Solver:
-      input_variables:
-       - foo
-      template: "Say {foo}"
+      prompt: !prompt ZeroShotSolverPrompt
 llm:
   - Planner:
-      name: llm
+      name: guanaco-7b
       description: 111
-      model_param:
-        model_name: 123
       model_name: 111123
   - Solver:
-      name: llm
+      name: guanaco-7b
       description: 122223
-      model_param:
-        model_name: 123
       model_name: 123
 target_tasks:
  - print
  - find
 
 plugins:
-   -  name: main
-      version: 0.0.1
-      description: example
-      type: rewoo
-      prompt_template:
-        - Planner:
-            input_variables:
-             - foo
-            template: "Say {foo}"
-        - Solver:
-            input_variables:
-             - foo
-            template: "Say {foo}"
-      llm:
-        - Planner:
-            name: llm
-            description: 111
-            model_param:
-              model_name: 123
-            model_name: 111123
-        - Solver:
-            name: llm
-            description: 122223
-            model_param:
-              model_name: 123
-            model_name: 123
-
-##  - !include: ./plugins/React/React-Router.js
-##  - !include: ./plugins/React/React-Redux.js
-#  - name: React-Router
-#    type: rewoo
-#    version: 0.0.1
-#    description: example
-#    prompt_template:
-#      input_variables:
-#       - foo
-#      template: "Say {foo}"
-#    llm:
-##      - Planner:
-#        name: llm
-#        description: 111
-#        model_param:
-#          model_name: 123
-#        model_name: 111123
-##      - Solver:
-##          name: llm
-##          description: 122223
-##          model_param:
-##            model_name: 123
-##          model_name: 123
-##    plugins:
-##      - !include: ./plugins/React/React-Router.js
-
-
+  - name: cal
+    version: 0.0.1
+    description: example
+    type: calculator
+  - name: wiki
+    version: 0.0.1
+    description: example
+    type: wikipedia
 

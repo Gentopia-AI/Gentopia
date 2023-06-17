@@ -10,7 +10,7 @@ class Calculator(BaseTool):
     name = "calculator"
     description = "A calculator that can compute arithmetic expressions. Useful when you need to perform " \
                   "math calculations. Input should be a mathematical expression"
-    args_schema = create_model("CalculatorArgs", expression=(str, ...))
+    args_schema: Optional[Type[BaseModel]] = create_model("CalculatorArgs", expression=(str, ...))
 
     def _run(self, expression: AnyStr) -> Any:
         llm = OpenAI(temperature=0)

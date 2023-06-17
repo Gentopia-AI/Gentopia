@@ -22,3 +22,15 @@ class BaseAgent(ABC, BaseModel):
     @abstractmethod
     def run(self, *args, **kwargs) -> AgentOutput:
         pass
+
+    def __str__(self):
+        return f"""
+        {f'Agent: {self.name}'.center(50, '-')}\n
+        Type: {self.type}\n
+        Version: {self.version}\n
+        Description: {self.description}\n
+        Target Tasks: {self.target_tasks}\n
+        LLM: {self.llm.model_name if isinstance(self.llm, BaseLLM) else
+        {k: v.model_name for k, v in self.llm.items()} }\n
+        Plugins: {[i.name for i in self.plugins]}\n
+        """

@@ -10,7 +10,7 @@ class ZipCodeRetriever(BaseTool):
     name = "zip_code_retriever"
     description = "A zip code retriever. Useful when you need to get users' current zip code. Input can be " \
                   "left blank."
-    args_schema = create_model("ZipCodeRetrieverArgs")
+    args_schema: Optional[Type[BaseModel]] = create_model("ZipCodeRetrieverArgs")
 
     def get_ip_address(self):
         response = requests.get("https://ipinfo.io/json")
