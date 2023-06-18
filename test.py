@@ -1,5 +1,5 @@
-from gentopia.config.agent_config import AgentConfig
-from gentopia.config.config import Config
+from gentopia.assembler.agent_assembler import AgentAssembler
+from gentopia.assembler.config import Config
 
 
 def print_tree(obj, indent=0):
@@ -27,6 +27,6 @@ if __name__ == '__main__':
     config = Config.load('config.yaml')
     print(config)
     # exit(0)
-    agent = AgentConfig(file='config.yaml').get_agent()
+    agent = AgentAssembler(file='config.yaml').get_agent()
     print(agent.run("1+1=?"))
     # print(agent.plugins)

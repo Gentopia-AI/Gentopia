@@ -116,7 +116,7 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
     Huggingface LLM client
     """
     model_name: str
-    model_param: HuggingfaceParamModel
+    params: HuggingfaceParamModel
     device: str  # cpu, mps, gpu, gpu-8bit, gpu-4bit
 
     @validator('device')
@@ -133,7 +133,7 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
         return self.model_name
 
     def get_model_param(self) -> BaseParamModel:
-        return self.model_param
+        return self.params
 
     def get_model_loader_info(self) -> HuggingfaceLoaderModel:
         model_loader = HuggingfaceLoader(model_name=self.model_name, device=self.device)
@@ -157,9 +157,9 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
 
         try:
             outputs = model.generate(inputs=inputs.input_ids,
-                                     temperature=self.model_param.temperature,
-                                     top_p=self.model_param.top_p,
-                                     max_new_tokens=self.model_param.max_new_tokens,
+                                     temperature=self.params.temperature,
+                                     top_p=self.params.top_p,
+                                     max_new_tokens=self.params.max_new_tokens,
                                      **kwargs
                                      )
             completion = tokenizer.decode(outputs[:, inputs.input_ids.shape[-1]:][0], skip_special_tokens=True)

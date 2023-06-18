@@ -1,7 +1,8 @@
+# Agent Config
 name: main
+type: rewoo
 version: 0.0.1
 description: example
-type: rewoo
 prompt_template:
   - Planner:
       prompt: !prompt ZeroShotPlannerPrompt
@@ -9,24 +10,30 @@ prompt_template:
       prompt: !prompt ZeroShotSolverPrompt
 llm:
   - Planner:
-      name: guanaco-7b
-      description: 111
-      model_name: 111123
+      model_name: gpt-4
+      params:
+        temperature: 0.7
   - Solver:
-      name: guanaco-7b
-      description: 122223
-      model_name: 123
+      model_name: gpt-4
+      params:
+        max_tokens: 1024
+        temperature: 0.0
+        frequency_penalty: 0.0
 target_tasks:
  - print
  - find
 
 plugins:
-  - name: cal
-    version: 0.0.1
-    description: example
-    type: calculator
-  - name: wiki
-    version: 0.0.1
-    description: example
-    type: wikipedia
+  - !include my_custom_agent.yaml
+  - !tool MyCustomTool
+  - name: calculator
+    params:
+      description: example
+  - name: wikipedia
+    params:
+      verbose: true
 
+
+# Authentication
+auth:
+  - OPENAI_API_KEY: <YOUR_API_KEY>

@@ -1,14 +1,14 @@
 from pathlib import Path
 
-from gentopia.config.agent_config import AgentConfig
+from gentopia.assembler.agent_assembler import AgentAssembler
 
 
 class PluginManager:
     def __init__(self, config):
         if isinstance(config, str) or isinstance(config, Path):
-            config = AgentConfig(file=config)
+            config = AgentAssembler(file=config)
         elif isinstance(config, list):
-            config = AgentConfig(config=config)
+            config = AgentAssembler(config=config)
         config.get_agent()
         self.config = config
         self.plugins = self.config.plugins

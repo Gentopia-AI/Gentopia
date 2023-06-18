@@ -1,7 +1,7 @@
 import pytest
 import yaml
 
-from gentopia.config.loader import Loader
+from gentopia.assembler.loader import Loader
 
 
 class Test01:

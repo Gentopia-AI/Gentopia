@@ -1,9 +1,11 @@
 from typing import Union, Dict
+import os
+import logging
 
+import torch.cuda
 from langchain import PromptTemplate
-
 from gentopia.agent.base_agent import BaseAgent
-from gentopia.config.config import Config
+from gentopia.assembler.config import Config
 from gentopia.llm import HuggingfaceLLMClient, OpenAIGPTClient
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.llm.llm_info import TYPES
@@ -13,7 +15,9 @@ from gentopia.tools import *
 from gentopia.tools import BaseTool
 
 
-class AgentConfig:
+# TODO: Install GentPool and load custom agents here.
+
+class AgentAssembler:
     def __init__(self, file=None, config=None):
         if file is not None:
             self.config = Config.from_file(file)
@@ -26,55 +30,63 @@ class AgentConfig:
         if config is None:
             config = self.config
         assert config is not None
-        name = config['name']
-        _type = AgentType(config['type'])
-        version = config['version']
-        description = config['description']
+        # Authentication
+        auth = config.get('auth', {})
+        self._set_auth_env(auth)
+
+        # Agent config
+        name = config.get('name')
+        _type = AgentType(config.get('type'))
+        version = config.get('version', "")
+        description = config.get('description', "")
         AgentClass = AgentType.get_agent_class(_type)
-        prompt_template = self.get_prompt_template(config['prompt_template'])
+        prompt_template = self._get_prompt_template(config.get('prompt_template'))
         agent = AgentClass(
             name=name,
             type=_type,
             version=version,
             description=description,
             target_tasks=config.get('target_tasks', []),
-            llm=self.get_llm(config['llm']),
+            llm=self._get_llm(config['llm']),
             prompt_template=prompt_template,
-            plugins=self.parse_plugins(config.get('plugins', []))
+            plugins=self._parse_plugins(config.get('plugins', []))
         )
         return agent
 
-    def get_llm(self, obj) -> Union[BaseLLM, Dict[str, BaseLLM]]:
+    def _get_llm(self, obj) -> Union[BaseLLM, Dict[str, BaseLLM]]:
         assert isinstance(obj, dict) or isinstance(obj, list)
         if isinstance(obj, list):
             return {
-                list(item.keys())[0]: self.parse_llm(list(item.values())[0]) for item in obj
+                list(item.keys())[0]: self._parse_llm(list(item.values())[0]) for item in obj
             }
         else:
-            return self.parse_llm(obj)
+            return self._parse_llm(obj)
 
-    def parse_llm(self, obj) -> BaseLLM:
-        name = obj['name']
-        model_param = obj.get('model_param', dict())
+    def _parse_llm(self, obj) -> BaseLLM:
+        name = obj['model_name']
+        model_param = obj.get('params', dict())
         if TYPES.get(name, None) == "OpenAI":
             key = obj.get('key', None)
             params = OpenAIParamModel(**model_param)
             return OpenAIGPTClient(model_name=name, params=params, api_key=key)
-        device = obj.get('device', 'cpu')
-        params = HuggingfaceParamModel(**model_param)
-        return HuggingfaceLLMClient(model_name=name, model_param=params, device=device)
+        elif TYPES.get(name, None) == "Huggingface":
+            device = obj.get('device', 'gpu' if torch.cuda.is_available() else 'cpu')
+            params = HuggingfaceParamModel(**model_param)
+            return HuggingfaceLLMClient(model_name=name, params=params, device=device)
+        else:
+            raise ValueError(f"LLM {name} is not supported currently.")
 
-    def get_prompt_template(self, obj):
+    def _get_prompt_template(self, obj):
         assert isinstance(obj, dict) or isinstance(obj, list)
         if isinstance(obj, list):
             return {
-                list(item.keys())[0]: self.parse_prompt_template(list(item.values())[0]) for item in obj
+                list(item.keys())[0]: self._parse_prompt_template(list(item.values())[0]) for item in obj
             }
         else:
-            ans = self.parse_prompt_template(obj)
+            ans = self._parse_prompt_template(obj)
             return ans
 
-    def parse_prompt_template(self, obj):
+    def _parse_prompt_template(self, obj):
         assert isinstance(obj, dict)
         if 'prompt' in obj:
             return obj['prompt']
@@ -85,22 +97,35 @@ class AgentConfig:
         return PromptTemplate(input_variables=input_variables, template=template, template_format=template_format,
                               validate_template=validate_template)
 
-
-    def parse_plugins(self, obj):
+    def _parse_plugins(self, obj):
         assert isinstance(obj, list)
         result = []
         for i in obj:
+            # If referring to a tool class then directly load it
+            if issubclass(i, BaseTool):
+                result.append(i)
+                continue
+
+            # Directly invoke already loaded plugin
             if i['name'] in self.plugins:
                 _plugin = self.plugins[i['name']]
                 result.append(_plugin)
                 continue
-            if 'llm' in i:
+
+            # Agent as plugin
+            if i.get('type', "") in AgentType.__members__:
                 agent = self.get_agent(i)
                 result.append(agent)
                 self.plugins[i['name']] = agent
+
+            # Tool as plugin
             else:
-                params = i.get('tool_param', dict())
-                tool = load_tools(i['type'])(**params)
+                params = i.get('params', dict())
+                tool = load_tools(i['name'])(**params)
                 result.append(tool)
                 self.plugins[i['name']] = tool
         return result
+
+    def _set_auth_env(self, obj):
+        for key in obj:
+            os.environ[key] = obj.get(key)
