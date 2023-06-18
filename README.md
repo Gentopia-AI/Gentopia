@@ -1,7 +1,7 @@
 # Gentopia 
 (⚠️Under Construction 👷‍♂️🛠️. Check out our [Vision](https://docs.google.com/presentation/d/1qO2BdBk7zwx9wxGb2iryuAsg0M9AUcldz5SPos8YFSE/edit#slide=id.p))
 
-The brain of Agents. It uses a strong LLM for sequantially chained reasoning (ReAct), whereas each reasoning step is assigned to an config-driven, lightweight and specialzed Agent from Gentopia-AI/GentPool.
+The brain of Agents. It uses a strong LLM for chained reasoning, whereas each reasoning step is assigned to an config-driven, lightweight and specialzed Agent from Gentopia-AI/GentPool.
 
 CORE FEATURES.
 - Gentopia, should provide various stable base LLMs, including API-driven ones like `gpt-4`, and open LLMs.
