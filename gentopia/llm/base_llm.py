@@ -8,7 +8,7 @@ from gentopia.model.param_model import BaseParamModel
 class BaseLLM(ABC, BaseModel):
 
     model_name: str
-    model_param: BaseParamModel
+    params: BaseParamModel
 
     @abstractmethod
     def get_model_name(self) -> str:

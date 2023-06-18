@@ -1,6 +1,8 @@
+from __future__ import annotations
 from enum import Enum
-
 from pydantic import BaseModel
+
+from gentopia.agent.base_agent import BaseAgent
 
 
 class AgentType(Enum):
@@ -12,7 +14,7 @@ class AgentType(Enum):
     DIRECT = "direct"
 
     @staticmethod
-    def get_agent_class(_type: 'AgentType'):
+    def get_agent_class(_type: AgentType):
         """
         Get agent class from agent type.
         :param _type: agent type

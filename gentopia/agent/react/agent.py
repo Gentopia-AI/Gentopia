@@ -8,7 +8,7 @@ from langchain.tools import BaseTool
 from pydantic import create_model, BaseModel
 
 from gentopia.agent.base_agent import BaseAgent
-from gentopia.config.task import AgentAction
+from gentopia.assembler.task import AgentAction
 from gentopia.llm.client.openai import OpenAIGPTClient
 from gentopia.model.agent_model import AgentType, AgentOutput
 from gentopia.util.cost_helpers import calculate_cost
