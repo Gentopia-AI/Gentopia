@@ -1,7 +1,8 @@
 import json
 import os
-from typing import Generator
-
+from typing import Generator, Optional
+from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+from threading import Thread
 from pydantic import validator
 
 from gentopia.llm.base_llm import BaseLLM
@@ -118,6 +119,7 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
     model_name: str
     params: HuggingfaceParamModel
     device: str  # cpu, mps, gpu, gpu-8bit, gpu-4bit
+    model: Optional[BaseLLM] = None
 
     @validator('device')
     def validate_device(cls, v):
@@ -144,17 +146,20 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
         Generate completion
         """
         # Load model
-        model_loader = HuggingfaceLoader(model_name=self.model_name, device=self.device)
-        loads = model_loader.load_model()
-        if loads is None:
-            raise ValueError(f"model {self.model_name} is not supported")
-        model, tokenizer = loads
+        if self.model is None:
+            print("Load model!")
+            model_loader = HuggingfaceLoader(model_name=self.model_name, device=self.device)
+            loads = model_loader.load_model()
+            if loads is None:
+                raise ValueError(f"model {self.model_name} is not supported")
+            self.model = loads
+        model, tokenizer = self.model
+        print("done!")
         # Generate completion
         if self.device in ["gpu", "gpu-8bit", "gpu-4bit"]:
             inputs = tokenizer(prompt, return_tensors="pt").to(torch.device("cuda"))
         else:
             inputs = tokenizer(prompt, return_tensors="pt")
-
         try:
             outputs = model.generate(inputs=inputs.input_ids,
                                      temperature=self.params.temperature,
@@ -176,6 +181,39 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
         # TODO: Implement chat_completion
         raise NotImplementedError("chat_completion is not supported for Huggingface LLM")
 
-    def stream_chat_completion(self, message) -> Generator:
-        # TODO: Implement stream_chat_completion
-        raise NotImplementedError("stream_chat_completion is not supported for Huggingface LLM")
+    def stream_chat_completion(self, prompt, **kwargs) -> Generator:
+        # Load model
+        if self.model is None:
+            print("Load model!")
+            model_loader = HuggingfaceLoader(model_name=self.model_name, device=self.device)
+            loads = model_loader.load_model()
+            if loads is None:
+                raise ValueError(f"model {self.model_name} is not supported")
+            self.model = loads
+        model, tokenizer = self.model
+        print("done!")
+        # Generate completion
+        if self.device in ["gpu", "gpu-8bit", "gpu-4bit"]:
+            inputs = tokenizer(prompt, return_tensors="pt").to(torch.device("cuda"))
+        else:
+            inputs = tokenizer(prompt, return_tensors="pt")
+        streamer = TextIteratorStreamer(tokenizer)
+        generation_kwargs = dict(
+            inputs=inputs.input_ids,
+            temperature=self.params.temperature,
+            top_p=self.params.top_p,
+            max_new_tokens=self.params.max_new_tokens,
+            streamer=streamer,
+            **kwargs
+        )
+        thread = Thread(target=model.generate, kwargs=generation_kwargs)
+        thread.start()
+        generated_text = ""
+        n_input_tokens = inputs.input_ids.shape[1]
+
+        for new_text in streamer:
+            generated_text += new_text
+            yield BaseCompletion(state="success",
+                                 content=new_text,
+                                 prompt_token=n_input_tokens,
+                                 completion_token=len(generated_text))

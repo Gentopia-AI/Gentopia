@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Union, Dict, Optional
 import os
 import logging
 
@@ -9,6 +9,7 @@ from gentopia.assembler.config import Config
 from gentopia.llm import HuggingfaceLLMClient, OpenAIGPTClient
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.llm.llm_info import TYPES
+from gentopia.manager.base_llm_manager import BaseLLMManager
 from gentopia.model.agent_model import AgentType
 from gentopia.model.param_model import OpenAIParamModel, HuggingfaceParamModel
 from gentopia.tools import *
@@ -25,12 +26,13 @@ class AgentAssembler:
             self.config = Config.from_dict(config)
 
         self.plugins: Dict[str, Union[BaseAgent, BaseTool]] = dict()
+        self.manager: Optional[BaseLLMManager] = None
 
     def get_agent(self, config=None):
         if config is None:
             config = self.config
         assert config is not None
-        # Authentication
+
         auth = config.get('auth', {})
         self._set_auth_env(auth)
 
@@ -68,20 +70,22 @@ class AgentAssembler:
             name = obj
             model_param = dict()
         else:
-            print(obj)
             name = obj['model_name']
             model_param = obj.get('params', dict())
+        llm = None
         if TYPES.get(name, None) == "OpenAI":
-            #key = obj.get('key', None)
+            # key = obj.get('key', None)
             params = OpenAIParamModel(**model_param)
-            return OpenAIGPTClient(model_name=name, params=params)
+            llm = OpenAIGPTClient(model_name=name, params=params)
         elif TYPES.get(name, None) == "Huggingface":
-            print(obj)
             device = obj.get('device', 'gpu' if torch.cuda.is_available() else 'cpu')
             params = HuggingfaceParamModel(**model_param)
-            return HuggingfaceLLMClient(model_name=name, params=params, device=device)
-        else:
+            llm = HuggingfaceLLMClient(model_name=name, params=params, device=device)
+        if llm is None:
             raise ValueError(f"LLM {name} is not supported currently.")
+        if self.manager is None:
+            return llm
+        return self.manager.get_llm(name, params, cls=HuggingfaceLLMClient, device=device)
 
     def _get_prompt_template(self, obj):
         assert isinstance(obj, dict) or isinstance(obj, PromptTemplate)
@@ -107,30 +111,30 @@ class AgentAssembler:
     def _parse_plugins(self, obj):
         assert isinstance(obj, list)
         result = []
-        for i in obj:
+        for plugin in obj:
             # If referring to a tool class then directly load it
-            if isinstance(i, BaseTool):
-                result.append(i)
+            if issubclass(plugin.__class__, BaseTool):
+                result.append(plugin)
                 continue
 
             # Directly invoke already loaded plugin
-            if i['name'] in self.plugins:
-                _plugin = self.plugins[i['name']]
+            if plugin['name'] in self.plugins:
+                _plugin = self.plugins[plugin['name']]
                 result.append(_plugin)
                 continue
 
             # Agent as plugin
-            if i.get('type', "") in AgentType.__members__:
-                agent = self.get_agent(i)
+            if plugin.get('type', "") in AgentType.__members__:
+                agent = self.get_agent(plugin)
                 result.append(agent)
-                self.plugins[i['name']] = agent
+                self.plugins[plugin['name']] = agent
 
             # Tool as plugin
             else:
-                params = i.get('params', dict())
-                tool = load_tools(i['name'])(**params)
+                params = plugin.get('params', dict())
+                tool = load_tools(plugin['name'])(**params)
                 result.append(tool)
-                self.plugins[i['name']] = tool
+                self.plugins[plugin['name']] = tool
         return result
 
     def _set_auth_env(self, obj):

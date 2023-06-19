@@ -1,37 +1,27 @@
 # Agent Config
 name: main
-type: rewoo
+type: vanilla
 version: 0.0.1
 description: example
-prompt_template:
-  Planner: !prompt ZeroShotPlannerPrompt
-  Solver: !prompt ZeroShotSolverPrompt
+prompt_template: !prompt ZeroShotVanillaPrompt
 llm:
-  Planner:
-    model_name: gpt-4
-    params:
-      temperature: 0.7
-  Solver:
-    model_name: gpt-4
-    params:
-      max_tokens: 1024
-      temperature: 0.0
-      frequency_penalty: 0.0
-target_tasks:
- - print
- - find
-
-plugins:
-  - !include my_custom_agent.yaml
-  - !tool MyCustomTool
-  - name: calculator
-    params:
-      description: example
-  - name: wikipedia
-    params:
-      verbose: true
+  model_name: guanaco-7b
+  device: cpu
+#target_tasks:
+# - print
+# - find
+#
+#plugins:
+#  - !include my_custom_agent.yaml
+#  - !tool MyCustomTool
+#  - name: calculator
+#    params:
+#      description: example
+#  - name: wikipedia
+#    params:
+#      verbose: true
 
 
 # Authentication
-auth:
-  - OPENAI_API_KEY: <YOUR_API_KEY>
+#auth:
+#  - OPENAI_API_KEY: <YOUR_API_KEY>

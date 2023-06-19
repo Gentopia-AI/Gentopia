@@ -5,7 +5,8 @@ from pydantic import BaseModel
 
 
 class BaseParamModel(BaseModel):
-    pass
+    def __eq__(self, other):
+        return self.dict() == other.dict()
 
 
 class OpenAIParamModel(BaseModel):
