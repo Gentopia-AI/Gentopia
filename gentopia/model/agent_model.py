@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import Enum
 from pydantic import BaseModel
 
-from gentopia.agent.base_agent import BaseAgent
+#from gentopia.agent.base_agent import BaseAgent
 
 
 class AgentType(Enum):
@@ -11,7 +11,7 @@ class AgentType(Enum):
     """
     REACT = "react"
     REWOO = "rewoo"
-    DIRECT = "direct"
+    Vanilla = "vanilla"
 
     @staticmethod
     def get_agent_class(_type: AgentType):
@@ -26,7 +26,7 @@ class AgentType(Enum):
         elif _type == AgentType.REWOO:
             from gentopia.agent.rewoo import RewooAgent
             return RewooAgent
-        elif _type == AgentType.DIRECT:
+        elif _type == AgentType.Vanilla:
             from gentopia.agent.vanilla import VanillaAgent
             return VanillaAgent
         else:

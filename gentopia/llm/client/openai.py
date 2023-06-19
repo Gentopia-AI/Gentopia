@@ -9,15 +9,13 @@ from gentopia.model.completion_model import *
 from gentopia.model.param_model import *
 
 
-class OpenAIGPTClient(BaseLLM):
-    def __init__(self, model_name: str, params: OpenAIParamModel, api_key: str = None):
-        assert TYPES.get(model_name, None) == "OpenAI"
-        self.api_key = api_key
-        self.params = params
-        self.model_name = model_name
+class OpenAIGPTClient(BaseLLM, BaseModel):
+    model_name: str
+    params: OpenAIParamModel
+
+    def __init__(self, **data):
+        super().__init__(**data)
         openai.api_key = os.environ.get("OPENAI_API_KEY", "")
-        if api_key is not None:
-            openai.api_key = api_key
 
     def get_model_name(self) -> str:
         return self.model_name

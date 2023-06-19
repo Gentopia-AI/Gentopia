@@ -1,0 +1,26 @@
+# Agent Config
+name: main
+type: react
+version: 0.0.1
+description: dummy example
+prompt_template: !prompt ZeroShotReactPrompt
+llm:
+  model_name: gpt-4
+  device: gpu
+  params:
+    temperature: 0.1
+    top_p: 0.9
+    repetition_penalty: 1.0
+    max_tokens: 1024
+target_tasks:
+  - anything
+plugins:
+  - name: calculator
+    params:
+      description: example
+
+
+
+# Authentication
+auth:
+  OPENAI_API_KEY: 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

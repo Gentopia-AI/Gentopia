@@ -22,12 +22,12 @@ class Loader(yaml.SafeLoader):
 
     def prompt(self, node: yaml.Node) -> Any:
         prompt = self.construct_scalar(node)
-        prompt_cls = eval(prompt)
-        assert issubclass(prompt_cls, PromptTemplate)
-        return prompt_cls
+        prompt_ins = eval(prompt)
+        assert isinstance(prompt_ins, PromptTemplate)
+        return prompt_ins
 
     def tool(self, node: yaml.Node) -> Any:
         tool = self.construct_scalar(node)
-        tool_cls = eval(tool)
-        assert issubclass(tool_cls, BaseTool)
-        return tool_cls
+        tool_ins = eval(tool)
+        assert isinstance(tool_ins, BaseTool)
+        return tool_ins
