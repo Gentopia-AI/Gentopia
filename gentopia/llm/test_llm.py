@@ -16,7 +16,7 @@ class TestLLM(BaseLLM):
         pass
 
     def completion(self, prompt) -> BaseCompletion:
-        pass
+        return BaseCompletion(state="success", content="test")
 
     def chat_completion(self, message) -> ChatCompletion:
         pass

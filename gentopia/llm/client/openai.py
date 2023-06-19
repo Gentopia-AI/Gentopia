@@ -65,6 +65,34 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
             print("Exception:", exception)
             return ChatCompletion(state="error", content=exception)
 
-    def stream_chat_completion(self, prompt: str):
-        # TODO: Implement stream_chat_completion
-        raise NotImplementedError("TO BE IMPLEMENTED")
+    def stream_chat_completion(self, message: List[dict]):
+        try:
+            response = openai.ChatCompletion.create(
+                n=self.params.n,
+                model=self.model_name,
+                messages=message,
+                temperature=self.params.temperature,
+                max_tokens=self.params.max_tokens,
+                top_p=self.params.top_p,
+                frequency_penalty=self.params.frequency_penalty,
+                presence_penalty=self.params.presence_penalty,
+                stream=True
+            )
+            role = next(response).choices[0].delta["role"]
+            messages = []
+            ## TODO: Calculate prompt_token and completion_token
+            for resp in response:
+                messages.append(resp.choices[0].delta["content"])
+                yield ChatCompletion(state="success",
+                                     role=role,
+                                     content=messages[-1],
+                                     prompt_token=0,
+                                     completion_token=0)
+            return ChatCompletion(state="success",
+                                  role=role,
+                                  content=''.join(messages),
+                                  prompt_token=0,
+                                  completion_token=0)
+        except Exception as exception:
+            print("Exception:", exception)
+            return ChatCompletion(state="error", content=exception)
