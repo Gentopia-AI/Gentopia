@@ -54,22 +54,29 @@ class AgentAssembler:
         return agent
 
     def _get_llm(self, obj) -> Union[BaseLLM, Dict[str, BaseLLM]]:
-        assert isinstance(obj, dict) or isinstance(obj, list)
-        if isinstance(obj, list):
+        assert isinstance(obj, dict) or isinstance(obj, str)
+        if isinstance(obj, dict) and ("model_name" not in obj):
             return {
-                list(item.keys())[0]: self._parse_llm(list(item.values())[0]) for item in obj
+                #list(item.keys())[0]: self._parse_llm(list(item.values())[0]) for item in obj
+                key: self._parse_llm(obj[key]) for key in obj
             }
         else:
             return self._parse_llm(obj)
 
     def _parse_llm(self, obj) -> BaseLLM:
-        name = obj['model_name']
-        model_param = obj.get('params', dict())
+        if isinstance(obj, str):
+            name = obj
+            model_param = dict()
+        else:
+            print(obj)
+            name = obj['model_name']
+            model_param = obj.get('params', dict())
         if TYPES.get(name, None) == "OpenAI":
-            key = obj.get('key', None)
+            #key = obj.get('key', None)
             params = OpenAIParamModel(**model_param)
-            return OpenAIGPTClient(model_name=name, params=params, api_key=key)
+            return OpenAIGPTClient(model_name=name, params=params)
         elif TYPES.get(name, None) == "Huggingface":
+            print(obj)
             device = obj.get('device', 'gpu' if torch.cuda.is_available() else 'cpu')
             params = HuggingfaceParamModel(**model_param)
             return HuggingfaceLLMClient(model_name=name, params=params, device=device)
@@ -77,19 +84,19 @@ class AgentAssembler:
             raise ValueError(f"LLM {name} is not supported currently.")
 
     def _get_prompt_template(self, obj):
-        assert isinstance(obj, dict) or isinstance(obj, list)
-        if isinstance(obj, list):
+        assert isinstance(obj, dict) or isinstance(obj, PromptTemplate)
+        if isinstance(obj, dict):
             return {
-                list(item.keys())[0]: self._parse_prompt_template(list(item.values())[0]) for item in obj
+                key: self._parse_prompt_template(obj[key]) for key in obj
             }
         else:
             ans = self._parse_prompt_template(obj)
             return ans
 
     def _parse_prompt_template(self, obj):
-        assert isinstance(obj, dict)
-        if 'prompt' in obj:
-            return obj['prompt']
+        assert isinstance(obj, dict) or isinstance(obj, PromptTemplate)
+        if isinstance(obj, PromptTemplate):
+            return obj
         input_variables = obj['input_variables']
         template = obj['template']
         template_format = obj.get('template_format', 'f-string')
@@ -102,7 +109,7 @@ class AgentAssembler:
         result = []
         for i in obj:
             # If referring to a tool class then directly load it
-            if issubclass(i, BaseTool):
+            if isinstance(i, BaseTool):
                 result.append(i)
                 continue
 

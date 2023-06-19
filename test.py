@@ -24,9 +24,9 @@ def print_tree(obj, indent=0):
 
 
 if __name__ == '__main__':
-    config = Config.load('config.yaml')
+    config = Config.load('main.yaml')
     print(config)
     # exit(0)
-    agent = AgentAssembler(file='config.yaml').get_agent()
-    print(agent.run("1+1=?"))
+    agent = AgentAssembler(file='main.yaml').get_agent()
+    print(agent.run("If 2 apples cost $1.20, how much do 5 apples cost?"))
     # print(agent.plugins)

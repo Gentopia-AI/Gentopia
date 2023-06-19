@@ -10,5 +10,5 @@ def load_model(loader_model: HuggingfaceLoaderModel):
     model = AutoModelForCausalLM.from_pretrained(*args, **kwargs)
     if loader_model.device == "gpu":
         model.half()
-    model = BetterTransformer.transform(model)
+    #model = BetterTransformer.transform(model)
     return model, tokenizer

@@ -16,7 +16,7 @@ Thought: I now know the final answer
 Final Answer: the final answer to the original input question
 Begin!
 
-Question: {input}
+Question: {instruction}
 Thought:{agent_scratchpad}
     """
 )
