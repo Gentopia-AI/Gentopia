@@ -23,4 +23,4 @@ plugins:
 
 # Authentication
 auth:
-  OPENAI_API_KEY: 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
+  OPENAI_API_KEY: <YOUR_API_KEY>
