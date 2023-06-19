@@ -45,7 +45,6 @@ class LocalLLMClient(BaseLLMClient):
 
     def _stream(self, prompt):
         for x in self.llm.stream_chat_completion(prompt):
-            print(x.content)
             yield x.content + "\n"
 
     def stream_chat_completion(self, prompt):

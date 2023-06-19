@@ -1,3 +1,4 @@
+from gentopia.agent.rewoo.nodes.Planner import Planner
 from gentopia.assembler.agent_assembler import AgentAssembler
 from gentopia.assembler.config import Config
 from gentopia.llm import HuggingfaceLLMClient
@@ -32,14 +33,24 @@ import multiprocessing as mp
 
 if __name__ == '__main__':
     mp.set_start_method('spawn', force=True)
-    config = Config.load('config.yaml')
+    config = Config.load('config/carol.yaml')
     print(config)
     # exit(0)
-    assembler = AgentAssembler(file='config.yaml')
+    assembler = AgentAssembler(file='config/carol.yaml')
     assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
     ans = ""
-    for i in agent.llm.stream_chat_completion("1+1=?"):
+    inp = "1+1=?"
+    planner_llm = agent._get_llms()["Planner"]
+
+    planner = Planner(model=planner_llm,
+                      workers=agent.plugins,
+                      prompt_template=agent.prompt_template.get("Planner", None),
+                      examples=agent.examples.get("Planner", None))
+
+    inp = planner._compose_prompt(inp)
+    print(inp)
+    for i in agent.llm['Planner'].stream_chat_completion(inp):
         print(i)
         ans += i.content
         print(ans)
