@@ -16,10 +16,10 @@ from gentopia.util.text_helpers import *
 
 class RewooAgent(BaseAgent):
     name: str = "RewooAgent"
-    type: AgentType = AgentType.REWOO
-    version: str
+    type: AgentType = AgentType.rewoo
+    version: str = ""
     description: str
-    target_tasks: list[str]
+    target_tasks: list[str] = []
     llm: Union[BaseLLM, Dict[str, BaseLLM]]  # {"Planner": xxx, "Solver": xxx}
     prompt_template: Dict[str, PromptTemplate]  # {"Planner": xxx, "Solver": xxx}
     plugins: List[Union[BaseTool, BaseAgent]]

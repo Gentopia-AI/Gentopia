@@ -10,7 +10,7 @@ from gentopia.util.text_helpers import *
 
 class VanillaAgent(BaseAgent):
     name: str = "VanillaAgent"
-    type: AgentType = AgentType.Vanilla
+    type: AgentType = AgentType.vanilla
     version: str
     description: str
     target_tasks: list[str]

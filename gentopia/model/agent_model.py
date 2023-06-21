@@ -9,9 +9,10 @@ class AgentType(Enum):
     """
     Enumerated type for agent types.
     """
-    REACT = "react"
-    REWOO = "rewoo"
-    Vanilla = "vanilla"
+    openai = "openai"
+    react = "react"
+    rewoo = "rewoo"
+    vanilla = "vanilla"
 
     @staticmethod
     def get_agent_class(_type: AgentType):
@@ -20,15 +21,18 @@ class AgentType(Enum):
         :param _type: agent type
         :return: agent class
         """
-        if _type == AgentType.REACT:
+        if _type == AgentType.react:
             from gentopia.agent.react import ReactAgent
             return ReactAgent
-        elif _type == AgentType.REWOO:
+        elif _type == AgentType.rewoo:
             from gentopia.agent.rewoo import RewooAgent
             return RewooAgent
-        elif _type == AgentType.Vanilla:
+        elif _type == AgentType.vanilla:
             from gentopia.agent.vanilla import VanillaAgent
             return VanillaAgent
+        elif _type == AgentType.openai:
+            from gentopia.agent.openai import OpenAIFunctionChatAgent
+            return OpenAIFunctionChatAgent
         else:
             raise ValueError(f"Unknown agent type: {_type}")
 
