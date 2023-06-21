@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from typing import List, Dict
 
 class BaseCompletion(BaseModel):
     state: str  # "success" or "error"
@@ -18,3 +18,7 @@ class BaseCompletion(BaseModel):
 
 class ChatCompletion(BaseCompletion):
     role: str = "assistant"  # "system" or "user" or "assistant"
+
+
+class ChatCompletionWithHistory(ChatCompletion):
+    message_scratchpad: List[Dict]

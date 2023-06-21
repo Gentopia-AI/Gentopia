@@ -17,7 +17,7 @@ class BaseAgent(ABC, BaseModel):
     llm: Union[BaseLLM, Dict[str, BaseLLM]]
     prompt_template: Union[PromptTemplate, Dict[str, PromptTemplate]]
     plugins: List[Any]
-    args_schema: Optional[Type[BaseModel]] = create_model("ArgsSchema", input=(str, ...))
+    args_schema: Optional[Type[BaseModel]] = create_model("ArgsSchema", instruction=(str, ...))
 
     @abstractmethod
     def run(self, *args, **kwargs) -> AgentOutput:

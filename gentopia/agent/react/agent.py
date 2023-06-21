@@ -19,7 +19,7 @@ FINAL_ANSWER_ACTION = "Final Answer:"
 
 class ReactAgent(BaseAgent):
     name: str = "ReactAgent"
-    type: AgentType = AgentType.REACT
+    type: AgentType = AgentType.react
     version: str
     description: str
     target_tasks: list[str]
