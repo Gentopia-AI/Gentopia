@@ -11,8 +11,7 @@ CORE FEATURES.
 
 
 # RoadMap 📌
-- [ ] Infra of Gentopia, GentPool and GentBench.
-- [ ] First assemble and run.
+- [x] First assemble and run.
 - [ ] First specialized / optimized agent.
 - [ ] First benchmark eval of the agent.
 - [ ] Wiki page ramp up.
