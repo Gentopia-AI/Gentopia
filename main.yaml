@@ -44,4 +44,4 @@ plugins:
 
 # Authentication
 auth:
-  OPENAI_API_KEY: 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
+  OPENAI_API_KEY: !file /home/billxbf/Documents/myks/openai.key

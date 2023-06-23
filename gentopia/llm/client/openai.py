@@ -117,7 +117,6 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
                 presence_penalty=self.params.presence_penalty,
             )
             response_message = response.choices[0]["message"]
-            print("!!!!!", response_message)
 
             if response_message.get("function_call"):
                 function_name = response_message["function_call"]["name"]
