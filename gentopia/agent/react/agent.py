@@ -4,13 +4,12 @@ from typing import List, Union, Optional, Type, Tuple
 
 from langchain import PromptTemplate
 from langchain.schema import AgentFinish
-from gentopia.tools import BaseTool
+from langchain.tools import BaseTool
 from pydantic import create_model, BaseModel
 
 from gentopia.agent.base_agent import BaseAgent
-from gentopia.assembler.task import AgentAction
+from gentopia.config.task import AgentAction
 from gentopia.llm.client.openai import OpenAIGPTClient
-from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType, AgentOutput
 from gentopia.util.cost_helpers import calculate_cost
 
@@ -19,11 +18,11 @@ FINAL_ANSWER_ACTION = "Final Answer:"
 
 class ReactAgent(BaseAgent):
     name: str = "ReactAgent"
-    type: AgentType = AgentType.react
+    type: AgentType = AgentType.REWOO
     version: str
     description: str
     target_tasks: list[str]
-    llm: BaseLLM
+    llm: OpenAIGPTClient
     prompt_template: PromptTemplate
     plugins: List[Union[BaseTool, BaseAgent]]
     examples: Union[str, List[str]] = None
@@ -44,7 +43,7 @@ class ReactAgent(BaseAgent):
             for plugin in self.plugins:
                 prompt += f"{plugin.name}[input]: {plugin.description}\n"
         except Exception:
-            raise ValueError("Plugin must have a name and description.")
+            raise ValueError("Worker must have a name and description.")
         return prompt
 
     def _construct_scratchpad(
@@ -122,9 +121,10 @@ class ReactAgent(BaseAgent):
         logging.info(f"Prompt: {prompt}")
         response = self.llm.completion(prompt)
         if response.state == "error":
-            logging.error("Failed to retrieve response from LLM")
-            raise ValueError("Failed to retrieve response from LLM")
+            logging.error("Planner failed to retrieve response from LLM")
+            raise ValueError("Planner failed to retrieve response from LLM")
 
+        logging.info(f"Planner run successful.")
         total_cost += calculate_cost(self.llm.model_name, response.prompt_token,
                                      response.completion_token)
         total_token += response.prompt_token + response.completion_token
