@@ -33,13 +33,13 @@ import multiprocessing as mp
 if __name__ == '__main__':
     mp.set_start_method('spawn', force=True)
     config = Config.load('main.yaml')
-    print(config)
+    #print(config)
     # exit(0)
     assembler = AgentAssembler(file='main.yaml')
     #assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
     ans = ""
-    response = agent.run("what is the square root of 23?")
+    response = agent.run("who is Leonardo da Vinci's first wife?")
     print(response)
     # for i in agent.llm.stream_chat_completion("what is the square root of 23?"):
     #     print(i)
