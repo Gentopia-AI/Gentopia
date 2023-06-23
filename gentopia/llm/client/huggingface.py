@@ -184,14 +184,12 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
     def stream_chat_completion(self, prompt, **kwargs) -> Generator:
         # Load model
         if self.model is None:
-            print("Load model!")
             model_loader = HuggingfaceLoader(model_name=self.model_name, device=self.device)
             loads = model_loader.load_model()
             if loads is None:
                 raise ValueError(f"model {self.model_name} is not supported")
             self.model = loads
         model, tokenizer = self.model
-        print("done!")
         # Generate completion
         if self.device in ["gpu", "gpu-8bit", "gpu-4bit"]:
             inputs = tokenizer(prompt, return_tensors="pt").to(torch.device("cuda"))

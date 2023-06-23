@@ -1,3 +1,4 @@
+import io
 from abc import ABC, abstractmethod
 from typing import List, Dict, Union, Any, Optional, Type
 
@@ -6,6 +7,8 @@ from pydantic import BaseModel, create_model
 
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType, AgentOutput
+
+from rich import print as rprint
 
 
 class BaseAgent(ABC, BaseModel):
@@ -23,14 +26,23 @@ class BaseAgent(ABC, BaseModel):
     def run(self, *args, **kwargs) -> AgentOutput:
         pass
 
+    @abstractmethod
+    def stream(self, *args, **kwargs) -> AgentOutput:
+        pass
+
+    # def __str__(self):
+    #     return f"""
+    #     {f'Agent: {self.name}'.center(50, '-')}\n
+    #     Type: {self.type}\n
+    #     Version: {self.version}\n
+    #     Description: {self.description}\n
+    #     Target Tasks: {self.target_tasks}\n
+    #     LLM: {self.llm.model_name if isinstance(self.llm, BaseLLM) else
+    #     {k: v.model_name for k, v in self.llm.items()} }\n
+    #     Plugins: {[i.name for i in self.plugins]}\n
+    #     """
+
     def __str__(self):
-        return f"""
-        {f'Agent: {self.name}'.center(50, '-')}\n
-        Type: {self.type}\n
-        Version: {self.version}\n
-        Description: {self.description}\n
-        Target Tasks: {self.target_tasks}\n
-        LLM: {self.llm.model_name if isinstance(self.llm, BaseLLM) else
-        {k: v.model_name for k, v in self.llm.items()} }\n
-        Plugins: {[i.name for i in self.plugins]}\n
-        """
+        result = io.StringIO()
+        rprint(self, file=result)
+        return result.getvalue()

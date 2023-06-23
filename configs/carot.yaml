@@ -1,0 +1,31 @@
+# Agent Config
+name: main
+type: rewoo
+version: 0.0.1
+description: example
+prompt_template:
+  Planner: !prompt ZeroShotPlannerPrompt
+  Solver: !prompt ZeroShotSolverPrompt
+llm:
+  Planner:
+    model_name: guanaco-7b
+    device: cpu
+  Solver:
+    model_name: guanaco-7b
+    device: cpu
+#target_tasks:
+# - print
+# - find
+#
+plugins:
+#  - !include my_custom_agent.yaml
+#  - !tool MyCustomTool
+  - name: calculator
+  - name: wikipedia
+    params:
+      verbose: true
+
+
+# Authentication
+#auth:
+#  - OPENAI_API_KEY: <YOUR_API_KEY>

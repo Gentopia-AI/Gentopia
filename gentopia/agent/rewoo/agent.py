@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from langchain import PromptTemplate
 
@@ -9,9 +9,10 @@ from gentopia.agent.rewoo.nodes.Planner import Planner
 from gentopia.agent.rewoo.nodes.Solver import Solver
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType
+from gentopia.output.base_output import BaseOutput
 from gentopia.tools import BaseTool
-from gentopia.util.cost_helpers import *
-from gentopia.util.text_helpers import *
+from gentopia.utils.cost_helpers import *
+from gentopia.utils.text_helpers import *
 
 
 class RewooAgent(BaseAgent):
@@ -104,7 +105,7 @@ class RewooAgent(BaseAgent):
 
         return evidences, level
 
-    def _get_worker_evidence(self, planner_evidences, evidences_level):
+    def _get_worker_evidence(self, planner_evidences, evidences_level, output=None):
         worker_evidences = dict()
         for level in evidences_level:
             # TODO: Run simultaneously
@@ -123,6 +124,8 @@ class RewooAgent(BaseAgent):
                     worker_evidences[e] = get_plugin_response_content(self._find_plugin(tool).run(tool_input))
                 except:
                     worker_evidences[e] = "No evidence found."
+                finally:
+                    output.panel_print(worker_evidences[e], f"[green] Function Response of [blue]{tool}: ")
         return worker_evidences
 
     def _find_plugin(self, name: str):
@@ -170,5 +173,49 @@ class RewooAgent(BaseAgent):
 
         return AgentOutput(output=solver_output.content, cost=total_cost, token_usage=total_token)
 
-    def __str__(self):
-        return super().__str__()
+    def stream(self, instruction: str, output: Optional[BaseOutput] = None):
+        if output is None:
+            output = BaseOutput()
+        output.update_status(f"{self.name} is initializing...")
+        planner_llm = self._get_llms()["Planner"]
+        solver_llm = self._get_llms()["Solver"]
+        planner = Planner(model=planner_llm,
+                          workers=self.plugins,
+                          prompt_template=self.prompt_template.get("Planner", None),
+                          examples=self.examples.get("Planner", None))
+        solver = Solver(model=solver_llm,
+                        prompt_template=self.prompt_template.get("Solver", None),
+                        examples=self.examples.get("Solver", None))
+        output.done()
+
+        output.thinking(f"{self.name}'s Planner is thinking...")
+        response = planner.stream(instruction)
+        output.done()
+        output.print(f"[blue]{self.name}: ")
+        planner_output = ""
+        for i in response:
+            planner_output += i
+            if not i:
+                continue
+            output.panel_print(i + '\n' if i[-1] == '\n' else i, f"{self.name}'s Planner: ", True)
+        output.clear()
+        plan_to_es, plans = self._parse_plan_map(planner_output)
+        planner_evidences, evidence_level = self._parse_planner_evidences(planner_output)
+
+        worker_evidences = self._get_worker_evidence(planner_evidences, evidence_level, output=output)
+        worker_log = ""
+        for plan in plan_to_es:
+            worker_log += f"{plan}: {plans[plan]}\n"
+            for e in plan_to_es[plan]:
+                worker_log += f"{e}: {worker_evidences[e]}\n"
+
+        output.thinking(f"{self.name}'s Solver is thinking...")
+        response = solver.stream(instruction, worker_log)
+        output.done()
+        solver_output = ""
+        for i in response:
+            solver_output += i
+            if not i:
+                continue
+            output.panel_print(i + '\n' if i[-1] == '\n' else i, f"{self.name}'s Solver: ", True)
+        output.clear()

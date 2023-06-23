@@ -7,6 +7,7 @@ from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.completion_model import BaseCompletion
 from gentopia.prompt.rewoo import *
 from gentopia.tools import BaseTool
+import logging
 
 
 class Planner(BaseModel):
@@ -69,3 +70,9 @@ class Planner(BaseModel):
         else:
             logging.info(f"Planner run successful.")
             return response
+
+    def stream(self, instruction: str):
+        prompt = self._compose_prompt(instruction)
+        response = self.model.stream_chat_completion([{"role": "user", "content": prompt}])
+        for i in response:
+            yield i.content
