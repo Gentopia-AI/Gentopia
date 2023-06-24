@@ -43,4 +43,4 @@ class Loader(yaml.SafeLoader):
         if not filename.is_absolute():
             filename = self._root / filename
         with open(filename, 'r') as f:
-            return f.read()
+            return f.read().strip()

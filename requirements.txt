@@ -1,0 +1,14 @@
+fastapi==0.98.0
+geopy==2.3.0
+langchain==0.0.209
+optimum==1.8.6
+peft==0.4.0.dev0
+pydantic==1.10.9
+pytest==7.3.2
+PyYAML==6.0
+PyYAML==6.0
+Requests==2.31.0
+setuptools==67.8.0
+torch==2.0.1
+transformers==4.31.0.dev0
+uvicorn==0.22.0

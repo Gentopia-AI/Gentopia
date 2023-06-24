@@ -31,4 +31,5 @@ plugins:
 
 # Authentication
 auth:
-  OPENAI_API_KEY: !file api.key
+  OPENAI_API_KEY: !file /home/billxbf/Documents/myks/openai.key
+
