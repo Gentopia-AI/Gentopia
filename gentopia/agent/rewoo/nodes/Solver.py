@@ -1,4 +1,3 @@
-import logging
 from typing import List, Union
 
 from pydantic import BaseModel
@@ -6,6 +5,7 @@ from pydantic import BaseModel
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.completion_model import BaseCompletion
 from gentopia.prompt.rewoo import *
+import logging
 
 
 class Solver(BaseModel):
@@ -48,3 +48,9 @@ class Solver(BaseModel):
             logging.info(f"Solver run successful.")
 
             return response
+
+    def stream(self, instruction: str, plan_evidence: str):
+        prompt = self._compose_prompt(instruction, plan_evidence)
+        response = self.model.stream_chat_completion([{"role": "user", "content": prompt}])
+        for i in response:
+            yield i.content

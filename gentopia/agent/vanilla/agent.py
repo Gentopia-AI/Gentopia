@@ -1,11 +1,12 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType
+from gentopia.output.base_output import BaseOutput
 from gentopia.prompt.vanilla import *
-from gentopia.util.cost_helpers import *
-from gentopia.util.text_helpers import *
+from gentopia.utils.cost_helpers import *
+from gentopia.utils.text_helpers import *
 
 
 class VanillaAgent(BaseAgent):
@@ -39,9 +40,14 @@ class VanillaAgent(BaseAgent):
             else:
                 return FewShotVanillaPrompt.format(fewshot=fewshot, instruction=instruction)
 
-    def run(self, instruction: str) -> AgentOutput:
+    def run(self, instruction: str, output: Optional[BaseOutput] = None) -> AgentOutput:
         prompt = self._compose_prompt(instruction)
+        if output is None:
+            output = BaseOutput()
+        output.thinking(self.name)
         response = self.llm.completion(prompt)
+        output.done()
+        output.print(response.content)
         total_cost = calculate_cost(self.llm.model_name, response.prompt_token,
                                     response.completion_token)
         total_token = response.prompt_token + response.completion_token
@@ -50,3 +56,15 @@ class VanillaAgent(BaseAgent):
             output=response.content,
             cost=total_cost,
             token_usage=total_token)
+
+    def stream(self, instruction: str, output: Optional[BaseOutput] = None):
+        prompt = self._compose_prompt(instruction)
+        if output is None:
+            output = BaseOutput()
+        output.thinking(self.name)
+        response = self.llm.stream_chat_completion([{"role": "user", "content": prompt}])
+        output.done()
+        output.print(f"[blue]{self.name}: ")
+        for i in response:
+            output.panel_print(i.content, self.name, True)
+        output.clear()

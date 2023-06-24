@@ -1,0 +1,25 @@
+# Agent Config
+name: main
+type: vanilla
+version: 0.0.1
+description: example
+prompt_template: !prompt ZeroShotVanillaPrompt
+llm:
+  model_name: guanaco-7b
+  device: cpu
+#target_tasks:
+# - print
+# - find
+#
+plugins:
+#  - !include my_custom_agent.yaml
+#  - !tool MyCustomTool
+  - name: calculator
+  - name: wikipedia
+    params:
+      verbose: true
+
+
+# Authentication
+#auth:
+#  - OPENAI_API_KEY: <YOUR_API_KEY>

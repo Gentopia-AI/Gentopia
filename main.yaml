@@ -7,10 +7,10 @@ prompt_template: !prompt ZeroShotVanillaPrompt
 llm:
   model_name: gpt-3.5-turbo-0613
   params:
-    temperature: 0.1
+    temperature: 0.0
     top_p: 0.9
     repetition_penalty: 1.0
-    max_tokens: 2048
+    max_tokens: 1024
 target_tasks:
   - anything
 plugins:
@@ -19,7 +19,7 @@ plugins:
     description: A math agent capable of solving complicated math problems. Ask it to solve any math problems.
     prompt_template: !prompt ZeroShotVanillaPrompt
     llm:
-      model_name: gpt-4
+      model_name: gpt-3.5-turbo-0613
       params:
         temperature: 0.0
         top_p: 1.0
@@ -27,21 +27,9 @@ plugins:
     target_tasks:
       - solving math problems
       - answer things about math
-  - name: wikier
-    type: rewoo
-    description: A knowledgeable agent capable of finding truths on wikipedia.
-    prompt_template:
-      Planner: !prompt ZeroShotPlannerPrompt
-      Solver: !prompt ZeroShotSolverPrompt
-    llm:
-      Planner:
-        model_name: gpt-4
-      Solver:
-        model_name: gpt-4
-    plugins:
-      - name: wikipedia
 
 
 # Authentication
 auth:
   OPENAI_API_KEY: !file /home/billxbf/Documents/myks/openai.key
+
