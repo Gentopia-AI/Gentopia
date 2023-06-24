@@ -4,7 +4,7 @@ type: rewoo
 version: 0.0.1
 description: main agent leveraging OpenAI function call API.
 prompt_template:
-  Planner: !prompt ZeroShotPlannerPrompt
+  Planner: !prompt OneShotPlannerPrompt
   Solver: !prompt ZeroShotSolverPrompt
 llm:
   Planner:
@@ -41,4 +41,4 @@ plugins:
 
 # Authentication
 auth:
-  OPENAI_API_KEY: !file api.key
+  OPENAI_API_KEY: !file /home/billxbf/Documents/myks/openai.key
