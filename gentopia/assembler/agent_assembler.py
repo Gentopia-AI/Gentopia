@@ -1,7 +1,6 @@
 from typing import Union, Dict, Optional
 import os
 import logging
-
 import torch.cuda
 from langchain import PromptTemplate
 from gentopia.agent.base_agent import BaseAgent
@@ -14,6 +13,7 @@ from gentopia.model.agent_model import AgentType
 from gentopia.model.param_model import OpenAIParamModel, HuggingfaceParamModel
 from gentopia.tools import *
 from gentopia.tools import BaseTool
+from gentopia.tools.basetool import ToolMetaclass
 
 
 # TODO: Install GentPool and load custom agents here.
@@ -113,7 +113,7 @@ class AgentAssembler:
         result = []
         for plugin in obj:
             # If referring to a tool class then directly load it
-            if issubclass(plugin.__class__, BaseTool):
+            if issubclass(plugin.__class__, ToolMetaclass):
                 result.append(plugin)
                 continue
 

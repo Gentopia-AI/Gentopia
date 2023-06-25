@@ -1,6 +1,6 @@
 import signal
 import time
-import os
+
 import rich
 from rich.box import Box
 
@@ -72,8 +72,7 @@ if __name__ == '__main__':
     # print(config)calculate sqrt(10),then tell me what is GIL in python, and then calculate sqrt(100)
     # exit(0)give me some sentences in markdown format
 
-    print(os.listdir())
-    assembler = AgentAssembler(file='config.yaml')
+    assembler = AgentAssembler(file='configs/main.yaml')
     # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
     ask(agent)

@@ -5,7 +5,8 @@ from .llm import LLM
 from .search_doc import SearchDoc
 from .wikipedia import Wikipedia
 from .wolfram_alpha import WolframAlpha
-
+from .web_page import WebPage
+# from .summarize import Summarize
 
 def load_tools(name: str) -> BaseTool:
     if name == "calculator":
@@ -20,5 +21,9 @@ def load_tools(name: str) -> BaseTool:
         return Wikipedia
     elif name == "wolfram_alpha":
         return WolframAlpha
+    elif name == "web_page":
+        return WebPage
+    # elif name == "summarize":
+    #     return Summarize
     else:
         raise NotImplementedError

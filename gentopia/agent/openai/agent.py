@@ -19,6 +19,7 @@ from gentopia.assembler.task import AgentAction
 from gentopia.llm.client.openai import OpenAIGPTClient
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType, AgentOutput
+from gentopia.tools.basetool import ToolMetaclass
 from gentopia.utils.cost_helpers import calculate_cost
 
 
@@ -70,7 +71,10 @@ class OpenAIFunctionChatAgent(BaseAgent):
         # Map the function name to the real function object.
         function_map = {}
         for plugin in self.plugins:
-            function_map[plugin.name] = plugin.run
+            if isinstance(plugin, BaseTool):
+                function_map[plugin.name] = plugin._run
+            else:
+                function_map[plugin.name] = plugin.run
         return function_map
 
     def _format_function_schema(self) -> List[Dict]:
@@ -151,3 +155,7 @@ class OpenAIFunctionChatAgent(BaseAgent):
                                             "name": function_name,
                                             "content": function_response})
             self.stream(output=output)
+        # else:
+        #     self.message_scratchpad.append({"role": "user", "content": "Summarize what you have done and continue if you have not finished."})
+        #     self.stream(output=output)
+

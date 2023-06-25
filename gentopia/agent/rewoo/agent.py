@@ -106,7 +106,7 @@ class RewooAgent(BaseAgent):
 
         return evidences, level
 
-    def _get_worker_evidence(self, planner_evidences, evidences_level, output=None):
+    def _get_worker_evidence(self, planner_evidences, evidences_level, output=BaseOutput()):
         worker_evidences = dict()
         for level in evidences_level:
             # TODO: Run simultaneously
