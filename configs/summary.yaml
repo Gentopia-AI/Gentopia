@@ -1,0 +1,13 @@
+# Agent Config
+name: summary
+type: vanilla
+version: 0.0.1
+description: A agent capable of summarize text.
+prompt_template: !prompt SummaryVanillaPrompt
+llm:
+  model_name: gpt-3.5-turbo
+  params:
+    temperature: 0.0
+    top_p: 0.9
+    repetition_penalty: 1.0
+    max_tokens: 1024

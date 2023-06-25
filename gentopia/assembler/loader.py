@@ -4,6 +4,7 @@ from gentopia.prompt import *
 from gentopia.tools.basetool import BaseTool
 import yaml
 import os
+from gentopia.tools import *
 
 
 class Loader(yaml.SafeLoader):
