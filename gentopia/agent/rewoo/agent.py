@@ -37,53 +37,53 @@ class RewooAgent(BaseAgent):
 
     def _parse_plan_map(self, planner_response: str) -> List[dict[str, List[str]]]:
         """
-        Parse planner output. It should be an n-to-n mapping from Plans to *Es.
+        Parse planner output. It should be an n-to-n mapping from Plans to #Es.
         This is because sometimes LLM cannot follow the strict output format.
         Example:
-            *Plan1
-            *E1
-            *E2
-        should result in: {"Plan1": ["*E1", "*E2"]}
+            #Plan1
+            #E1
+            #E2
+        should result in: {"#Plan1": ["#E1", "#E2"]}
         Or:
-            *Plan1
-            *Plan2
-            *E1
-        should result in: {"*Plan1": [], "*Plan2": ["*E1"]}
+            #Plan1
+            #Plan2
+            #E1
+        should result in: {"#Plan1": [], "#Plan2": ["#E1"]}
         This function should also return a plan map.
         """
         valid_chunk = [line for line in planner_response.splitlines()
-                       if line.startswith("*Plan") or line.startswith("*E")]
+                       if line.startswith("#Plan") or line.startswith("#E")]
 
         plan_to_es = dict()
         plans = dict()
         for line in valid_chunk:
-            if line.startswith("*Plan"):
+            if line.startswith("#Plan"):
                 plan = line.split(":", 1)[0].strip()
                 plans[plan] = line.split(":", 1)[1].strip()
                 plan_to_es[plan] = []
-            elif line.startswith("*E"):
+            elif line.startswith("#E"):
                 plan_to_es[plan].append(line.split(":", 1)[0].strip())
 
         return plan_to_es, plans
 
     def _parse_planner_evidences(self, planner_response: str) -> (dict[str, str], List[List[str]]):
         """
-        Parse planner output. This should return a mapping from *E to tool call.
-        It should also identify the level of each *E in dependency map.
+        Parse planner output. This should return a mapping from #E to tool call.
+        It should also identify the level of each #E in dependency map.
         Example:
-            {"*E1": "Tool1", "*E2": "Tool2", "*E3": "Tool3", "*E4": "Tool4"}, [[*E1, *E2], [*E3, *E4]]
+            {"#E1": "Tool1", "#E2": "Tool2", "#E3": "Tool3", "#E4": "Tool4"}, [[#E1, #E2], [#E3, #E4]]
         """
         evidences, dependence = dict(), dict()
         num = 0
         for line in planner_response.splitlines():
-            if line.startswith("*E") and line[2].isdigit():
+            if line.startswith("#E") and line[2].isdigit():
                 e, tool_call = line.split(":", 1)
                 e, tool_call = e.strip(), tool_call.strip()
                 if len(e) == 3:
                     dependence[e] = []
                     num += 1
                     evidences[e] = tool_call
-                    for var in re.findall(r"\*E\d+", tool_call):
+                    for var in re.findall(r"#E\d+", tool_call):
                         if var in evidences:
                             dependence[e].append(var)
                 else:
@@ -91,6 +91,7 @@ class RewooAgent(BaseAgent):
         level = []
         while num > 0:
             level.append([])
+            print(dependence)
             for i in dependence:
                 if dependence[i] is None:
                     continue
@@ -117,7 +118,7 @@ class RewooAgent(BaseAgent):
                 tool, tool_input = tool_call.split("[", 1)
                 tool_input = tool_input[:-1]
                 # find variables in input and replace with previous evidences
-                for var in re.findall(r"\*E\d+", tool_input):
+                for var in re.findall(r"#E\d+", tool_input):
                     if var in worker_evidences:
                         tool_input = tool_input.replace(var, "[" + worker_evidences.get(var, "") + "]")
                 try:
