@@ -88,21 +88,21 @@ class RewooAgent(BaseAgent):
                             dependence[e].append(var)
                 else:
                     evidences[e] = "No evidence found"
-        level = []
-        while num > 0:
-            level.append([])
-            print(dependence)
-            for i in dependence:
-                if dependence[i] is None:
-                    continue
-                if len(dependence[i]) == 0:
-                    level[-1].append(i)
-                    num -= 1
-                    for j in dependence:
-                        if j is not None and i in dependence[j]:
-                            dependence[j].remove(i)
-                            if len(dependence[j]) == 0:
-                                dependence[j] = None
+        level = [list(evidences.keys())]
+        #TODO: There's a bug in level. Fix it and support parallel execution of workers
+        # while num > 0:
+        #     level.append([])
+        #     for i in dependence:
+        #         if dependence[i] is None:
+        #             continue
+        #         if len(dependence[i]) == 0:
+        #             level[-1].append(i)
+        #             num -= 1
+        #             for j in dependence:
+        #                 if j is not None and i in dependence[j]:
+        #                     dependence[j].remove(i)
+        #                     if len(dependence[j]) == 0:
+        #                         dependence[j] = None
 
         return evidences, level
 
