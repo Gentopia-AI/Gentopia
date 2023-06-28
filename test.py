@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # print(config)calculate sqrt(10),then tell me what is GIL in python, and then calculate sqrt(100)
     # exit(0)give me some sentences in markdown format
 
-    assembler = AgentAssembler(file='configs/main.yaml')
+    assembler = AgentAssembler(file='configs/mathria.yaml')
     # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
     ask(agent)
