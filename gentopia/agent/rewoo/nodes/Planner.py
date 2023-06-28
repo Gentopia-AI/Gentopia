@@ -1,10 +1,11 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 from pydantic import BaseModel
 
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.completion_model import BaseCompletion
+from gentopia.output.base_output import BaseOutput
 from gentopia.prompt.rewoo import *
 from gentopia.tools import BaseTool
 import logging
@@ -60,19 +61,22 @@ class Planner(BaseModel):
             else:
                 return ZeroShotPlannerPrompt.format(tool_description=worker_desctription, task=instruction)
 
-    def run(self, instruction: str) -> BaseCompletion:
-        logging.info("Running Planner")
+    def run(self, instruction: str, output: BaseOutput = BaseOutput()) -> BaseCompletion:
+
+        output.info("Running Planner")
         prompt = self._compose_prompt(instruction)
+        output.debug(f"Prompt: {prompt}")
         response = self.model.completion(prompt)
         if response.state == "error":
-            logging.error("Planner failed to retrieve response from LLM")
+            output.error("Planner failed to retrieve response from LLM")
             raise ValueError("Planner failed to retrieve response from LLM")
         else:
-            logging.info(f"Planner run successful.")
+            output.info(f"Planner run successful.")
             return response
 
-    def stream(self, instruction: str):
+    def stream(self, instruction: str, output: BaseOutput = BaseOutput()):
         prompt = self._compose_prompt(instruction)
+        output.debug(f"Prompt: {prompt}")
         response = self.model.stream_chat_completion([{"role": "user", "content": prompt}])
         for i in response:
             yield i.content

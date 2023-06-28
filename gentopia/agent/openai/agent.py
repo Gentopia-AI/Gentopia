@@ -113,6 +113,7 @@ class OpenAIFunctionChatAgent(BaseAgent):
         output.thinking(self.name)
         if instruction is not None:
             self.message_scratchpad.append({"role": "user", "content": instruction})
+        output.debug(self.message_scratchpad)
         assert len(self.message_scratchpad) > 1
         function_map = self._format_function_map()
         function_schema = self._format_function_schema()

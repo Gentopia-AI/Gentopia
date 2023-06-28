@@ -1,6 +1,5 @@
 from typing import Union, Dict, Optional
 import os
-import logging
 import torch.cuda
 from langchain import PromptTemplate
 from gentopia.agent.base_agent import BaseAgent
