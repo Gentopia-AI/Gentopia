@@ -7,7 +7,7 @@ ZeroShotVanillaPrompt = PromptTemplate(
 
 FewShotVanillaPrompt = PromptTemplate(
     input_variables=["instruction", "fewshot"],
-    template="""{instruction}
+    template="""{fewshot}
     
-{fewshot}"""
+{instruction}"""
 )
