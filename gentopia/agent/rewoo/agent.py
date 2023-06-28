@@ -89,9 +89,11 @@ class RewooAgent(BaseAgent):
                 else:
                     evidences[e] = "No evidence found"
         level = [list(evidences.keys())]
-        #TODO: There's a bug in level. Fix it and support parallel execution of workers
+        #TODO: Fix this
+
         # while num > 0:
         #     level.append([])
+        #     print(dependence)
         #     for i in dependence:
         #         if dependence[i] is None:
         #             continue
@@ -99,11 +101,11 @@ class RewooAgent(BaseAgent):
         #             level[-1].append(i)
         #             num -= 1
         #             for j in dependence:
-        #                 if j is not None and i in dependence[j]:
+        #                 if dependence[j] is not None and i in dependence[j]:
         #                     dependence[j].remove(i)
         #                     if len(dependence[j]) == 0:
         #                         dependence[j] = None
-
+        # print(level)
         return evidences, level
 
     def _get_worker_evidence(self, planner_evidences, evidences_level, output=BaseOutput()):
@@ -122,7 +124,7 @@ class RewooAgent(BaseAgent):
                     if var in worker_evidences:
                         tool_input = tool_input.replace(var, "[" + worker_evidences.get(var, "") + "]")
                 try:
-                    worker_evidences[e] = get_plugin_response_content(self._find_plugin(tool).run(to0ol_input))
+                    worker_evidences[e] = get_plugin_response_content(self._find_plugin(tool).run(tool_input))
                 except:
                     worker_evidences[e] = "No evidence found."
                 finally:
