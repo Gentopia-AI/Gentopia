@@ -4,11 +4,11 @@ from typing import List, Union, Optional, Type, Tuple
 
 from langchain import PromptTemplate
 from langchain.schema import AgentFinish
-from langchain.tools import BaseTool
+from gentopia.tools.basetool import BaseTool
 from pydantic import create_model, BaseModel
 
 from gentopia.agent.base_agent import BaseAgent
-from gentopia.config.task import AgentAction
+from gentopia.assembler.task import AgentAction
 from gentopia.llm.client.openai import OpenAIGPTClient
 from gentopia.model.agent_model import AgentType, AgentOutput
 from gentopia.utils.cost_helpers import calculate_cost
@@ -18,7 +18,7 @@ FINAL_ANSWER_ACTION = "Final Answer:"
 
 class ReactAgent(BaseAgent):
     name: str = "ReactAgent"
-    type: AgentType = AgentType.REWOO
+    type: AgentType = AgentType.react
     version: str
     description: str
     target_tasks: list[str]
@@ -121,12 +121,15 @@ class ReactAgent(BaseAgent):
         logging.info(f"Prompt: {prompt}")
         response = self.llm.completion(prompt)
         if response.state == "error":
-            logging.error("Planner failed to retrieve response from LLM")
+            print("Planner failed to retrieve response from LLM")
             raise ValueError("Planner failed to retrieve response from LLM")
 
-        logging.info(f"Planner run successful.")
+        print(f"Planner run successful.")
         total_cost += calculate_cost(self.llm.model_name, response.prompt_token,
                                      response.completion_token)
         total_token += response.prompt_token + response.completion_token
         self.intermediate_steps.append(self._parse_output(response.content))
         return AgentOutput(output=response.content, cost=total_cost, token_usage=total_token)
+
+    def stream(self, *args, **kwargs) -> AgentOutput:
+        pass

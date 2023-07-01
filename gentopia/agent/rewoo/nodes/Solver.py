@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.completion_model import BaseCompletion
+from gentopia.output.base_output import BaseOutput
 from gentopia.prompt.rewoo import *
 import logging
 
@@ -38,19 +39,26 @@ class Solver(BaseModel):
             else:
                 return ZeroShotSolverPrompt.format(plan_evidence=plan_evidence, task=instruction)
 
-    def run(self, instruction: str, plan_evidence: str) -> BaseCompletion:
-        logging.info("Running Solver")
+    def run(self, instruction: str, plan_evidence: str, output: BaseOutput = BaseOutput()) -> BaseCompletion:
+        output.info("Running Solver")
+        output.debug(f"Instruction: {instruction}")
+        output.debug(f"Plan Evidence: {plan_evidence}")
         prompt = self._compose_prompt(instruction, plan_evidence)
+        output.debug(f"Prompt: {prompt}")
         response = self.model.completion(prompt)
         if response.state == "error":
-            logging.error("Solver failed to retrieve response from LLM")
+            output.error("Solver failed to retrieve response from LLM")
         else:
-            logging.info(f"Solver run successful.")
+            output.info(f"Solver run successful.")
 
             return response
 
-    def stream(self, instruction: str, plan_evidence: str):
+    def stream(self, instruction: str, plan_evidence: str, output: BaseOutput = BaseOutput()):
+        output.info("Running Solver")
+        output.debug(f"Instruction: {instruction}")
+        output.debug(f"Plan Evidence: {plan_evidence}")
         prompt = self._compose_prompt(instruction, plan_evidence)
+        output.debug(f"Prompt: {prompt}")
         response = self.model.stream_chat_completion([{"role": "user", "content": prompt}])
         for i in response:
             yield i.content

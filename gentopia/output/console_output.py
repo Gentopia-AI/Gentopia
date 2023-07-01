@@ -35,6 +35,7 @@ class ConsoleOutput(BaseOutput):
         self.status: Optional[Status] = None
         self.live: Optional[Live] = None
         self.cache: str = ""
+        super().__init__()
 
     def stop(self):
         if self.status is not None:
@@ -47,6 +48,7 @@ class ConsoleOutput(BaseOutput):
         else:
             self.status = self.console.status(f"{style}{output}")
         self.status.start()
+        super().update_status(output)
 
     def thinking(self, name: str):
         self.status_stack.append(name)
@@ -55,6 +57,7 @@ class ConsoleOutput(BaseOutput):
         else:
             self.status = self.console.status(f"[bold green]{name} is thinking...")
         self.status.start()
+        super().thinking(name)
 
     def done(self, _all=False):
         if _all:
@@ -67,14 +70,18 @@ class ConsoleOutput(BaseOutput):
                 self.status.update(f"[bold green]{self.status_stack[-1]} is thinking...")
             else:
                 self.status.stop()
+        super().done(_all)
 
     def stream_print(self, item: str):
         self.console.print(item, end="")
 
     def json_print(self, item: Dict[str, Any]):
         self.console.print_json(data=item)
+        super().json_print(item)
 
     def panel_print(self, item: Any, title: str = "Output", stream: bool = False):
+        if not stream:
+            super().panel_print(item, title, stream)
         if not stream:
             self.console.print(Panel(item, title=title))
             return
@@ -89,14 +96,17 @@ class ConsoleOutput(BaseOutput):
         self.cache += item
         self.live.update(Panel(Markdown(self.cache), title=title, style="yellow", box=HEAVY))
 
+
     def clear(self):
         if self.live is not None:
             self.live.stop()
             self.live = None
+        super().print(self.cache)
         self.cache = ""
 
     def print(self, content: str, **kwargs):
         self.console.print(content, **kwargs)
+        super().print(content, **kwargs)
 
     def format_json(self, json_obj: str):
         formatted_json = json.dumps(json_obj, indent=2)

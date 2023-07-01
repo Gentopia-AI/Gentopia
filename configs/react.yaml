@@ -1,11 +1,11 @@
 # Agent Config
 name: main
-type: openai
+type: react
 version: 0.0.1
 description: main agent leveraging OpenAI function call API.
-prompt_template: !prompt ZeroShotVanillaPrompt
+prompt_template: !prompt ZeroShotReactPrompt
 llm:
-  model_name: gpt-4-0613
+  model_name: gpt-3.5-turbo
   params:
     temperature: 0.0
     top_p: 0.9
@@ -33,7 +33,6 @@ plugins:
 
 # Authentication
 auth:
-  OPENAI_API_KEY: !file /home/billxbf/Documents/myks/openai.key
-  WOLFRAM_ALPHA_APPID: !file /home/billxbf/Documents/myks/wolfram.key
-  WEATHER_API_KEY: null
-  BING_API_KEY: null
+  OPENAI_API_KEY: !file /home/api.key
+  WOLFRAM_ALPHA_APPID: !file /home/wolfram.key
+

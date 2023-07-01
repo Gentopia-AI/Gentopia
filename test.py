@@ -11,18 +11,19 @@ from gentopia.manager.local_llm_manager import LocalLLMManager
 from transformers import GenerationConfig
 
 from gentopia.model.param_model import HuggingfaceParamModel
+from gentopia.output import enable_log
 from gentopia.output.console_output import ConsoleOutput
 
 import logging
-import warnings
-
-warnings.filterwarnings("ignore")
+# import warnings
+#
+# warnings.filterwarnings("ignore")
 
 # 获取根logger对象
-root_logger = logging.getLogger()
-
-# 设置根logger级别为CRITICAL
-root_logger.setLevel(logging.CRITICAL)
+# root_logger = logging.getLogger()
+#
+# # 设置根logger级别为CRITICAL
+# root_logger.setLevel(logging.CRITICAL)
 
 
 def print_tree(obj, indent=0):
@@ -71,10 +72,16 @@ if __name__ == '__main__':
     # config = Config.load('main.yaml') # then tell me what is GIL in python
     # print(config)calculate sqrt(10),then tell me what is GIL in python, and then calculate sqrt(100)
     # exit(0)give me some sentences in markdown format
+    enable_log(log_level='debug')
 
     assembler = AgentAssembler(file='configs/main.yaml')
-    # assembler.manager = LocalLLMManager()
+    # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
+    #
+    # print(agent)
+    # x = "How old is trump?"
+    # agent.run(x)
+    # exit(0)
     ask(agent)
 
     # print(agent.llm.stream_chat_completion("1+1=?"))
