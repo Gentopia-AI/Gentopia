@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 import signal
 import time
 
@@ -72,7 +75,8 @@ if __name__ == '__main__':
     # config = Config.load('main.yaml') # then tell me what is GIL in python
     # print(config)calculate sqrt(10),then tell me what is GIL in python, and then calculate sqrt(100)
     # exit(0)give me some sentences in markdown format
-    enable_log(log_level='debug')
+    enable_log(log_level='info')
+    load_dotenv('.env')
 
     assembler = AgentAssembler(file='configs/main.yaml')
     # # assembler.manager = LocalLLMManager()

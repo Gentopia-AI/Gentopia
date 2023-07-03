@@ -122,7 +122,7 @@ class RewooAgent(BaseAgent):
                     if var in worker_evidences:
                         tool_input = tool_input.replace(var, "[" + worker_evidences.get(var, "") + "]")
                 try:
-                    worker_evidences[e] = get_plugin_response_content(self._find_plugin(tool).run(tool_input))
+                    worker_evidences[e] = get_plugin_response_content(self._find_plugin(tool).run(to0ol_input))
                 except:
                     worker_evidences[e] = "No evidence found."
                 finally:
