@@ -17,23 +17,5 @@ plugins:
   - name: google_search
   - name: web_page
   - !include mathria.yaml
-#    type: vanilla
-#    description: A math agent capable of solving complicated math problems. Ask it to solve any math problems.
-#    prompt_template: !prompt ZeroShotVanillaPrompt
-#    llm:
-#      model_name: gpt-3.5-turbo-0613
-#      params:
-#        temperature: 0.0
-#        top_p: 1.0
-#        max_tokens: 1024
-#    target_tasks:
-#      - solving math problems
-#      - answer things about math
 
 
-## Authentication
-#auth:
-#  OPENAI_API_KEY: !file /home/billxbf/Documents/myks/openai.key
-#  WOLFRAM_ALPHA_APPID: !file /home/billxbf/Documents/myks/wolfram.key
-#  WEATHER_API_KEY: null
-#  BING_API_KEY: null

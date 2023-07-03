@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import pexpect
 from typing import AnyStr
-from basetool import *
+from .basetool import *
 
 # Revised from the Contributor: [Sihan Zhao](https://github.com/Sarah816)
 

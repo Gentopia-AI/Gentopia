@@ -2,7 +2,7 @@ import requests
 import json
 import os
 from typing import AnyStr, Any
-from basetool import *
+from .basetool import *
 
 
 class Weather(BaseTool):

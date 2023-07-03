@@ -13,8 +13,8 @@ class OpenAIParamModel(BaseModel):
     """
     OpenAI API parameters
     """
-    max_tokens: int = 4032
-    temperature: float = 0.0
+    max_tokens: int = 2048
+    temperature: float = 0.2
     top_p: float = 1.0
     presence_penalty: float = 0.0
     frequency_penalty: float = 0.0
