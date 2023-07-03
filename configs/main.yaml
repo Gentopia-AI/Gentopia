@@ -35,5 +35,5 @@ plugins:
 auth:
   OPENAI_API_KEY: !file /home/billxbf/Documents/myks/openai.key
   WOLFRAM_ALPHA_APPID: !file /home/billxbf/Documents/myks/wolfram.key
-  WEATHER_API_KEY: null
-  BING_API_KEY: null
+#  WEATHER_API_KEY: null
+#  BING_API_KEY: null

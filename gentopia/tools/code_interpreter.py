@@ -1,5 +1,5 @@
 from typing import AnyStr
-from basetool import *
+from .basetool import *
 
 
 # Jerry: This tool can be dangerous
