@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 # from ..tool import Tool
 from enum import Enum
 from typing import Tuple
-from basetool import *
+from .basetool import *
 import os
 
 

@@ -1,6 +1,6 @@
 from typing import AnyStr
 from langchain import OpenAI, LLMMathChain
-from basetool import *
+from .basetool import *
 from xml.dom.pulldom import SAX2DOM
 from gradio_tools.tools import BarkTextToSpeechTool,StableDiffusionTool,DocQueryDocumentAnsweringTool,ImageCaptioningTool,StableDiffusionPromptGeneratorTool,TextToVideoTool,ImageToMusicTool,WhisperAudioTranscriptionTool,ClipInterrogatorTool
 from gradio_client.client import Job

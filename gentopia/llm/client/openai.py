@@ -13,7 +13,7 @@ import json
 
 class OpenAIGPTClient(BaseLLM, BaseModel):
     model_name: str
-    params: OpenAIParamModel
+    params: OpenAIParamModel = OpenAIParamModel()
 
     def __init__(self, **data):
         super().__init__(**data)

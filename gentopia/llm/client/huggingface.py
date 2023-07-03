@@ -117,7 +117,7 @@ class HuggingfaceLLMClient(BaseLLM, BaseModel):
     Huggingface LLM client
     """
     model_name: str
-    params: HuggingfaceParamModel
+    params: HuggingfaceParamModel = HuggingfaceParamModel()
     device: str  # cpu, mps, gpu, gpu-8bit, gpu-4bit
     model: Optional[BaseLLM] = None
 
