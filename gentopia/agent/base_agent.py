@@ -7,7 +7,7 @@ from pydantic import BaseModel, create_model
 
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType, AgentOutput
-
+from gentopia.memory.api import MemoryWrapper
 from rich import print as rprint
 
 
@@ -21,6 +21,7 @@ class BaseAgent(ABC, BaseModel):
     prompt_template: Union[PromptTemplate, Dict[str, PromptTemplate]]
     plugins: List[Any]
     args_schema: Optional[Type[BaseModel]] = create_model("ArgsSchema", instruction=(str, ...))
+    memory: Optional[MemoryWrapper]
 
     @abstractmethod
     def run(self, *args, **kwargs) -> AgentOutput:
