@@ -1,8 +1,12 @@
 TYPES = {
     "gpt-3.5-turbo": "OpenAI",
     "gpt-4": "OpenAI",
+    "gpt-3.5-turbo-16k": "OpenAI",
+    "gpt-4-32k": "OpenAI",
     "gpt-3.5-turbo-0613": "OpenAI",
     "gpt-4-0613": "OpenAI",
+    "gpt-3.5-turbo-16k-0613": "OpenAI",
+    "gpt-4-32k-0613": "OpenAI",
     "t5-vicuna-3b": "Huggingface",
     "replit-3b": "Huggingface",
     "camel-5b": "Huggingface",
@@ -46,6 +50,12 @@ TYPES = {
 }
 
 COSTS = {
-    "gpt-3.5-turbo": {"prompt": 0.002/1000, "completion": 0.002/1000},
+    "gpt-3.5-turbo": {"prompt": 0.0015/1000, "completion": 0.002/1000},
     "gpt-4": {"prompt": 0.03/1000, "completion": 0.06/1000},
+    "gpt-3.5-turbo-16k": {"prompt": 0.003/1000, "completion": 0.004/1000},
+    "gpt-4-32k": {"prompt": 0.06/1000, "completion": 0.12/1000},
+    "gpt-3.5-turbo-0613": {"prompt": 0.0015/1000, "completion": 0.002/1000},
+    "gpt-4-0613": {"prompt": 0.03/1000, "completion": 0.06/1000},
+    "gpt-3.5-turbo-16k-0613": {"prompt": 0.003/1000, "completion": 0.004/1000},
+    "gpt-4-32k-0613": {"prompt": 0.06/1000, "completion": 0.12/1000},
 }
