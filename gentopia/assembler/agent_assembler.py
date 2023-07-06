@@ -60,7 +60,7 @@ class AgentAssembler:
         if obj == []:
             return None
         memory_type = obj["memory_type"] # memory_type: ["pinecone"]
-        return create_memory(memory_type, **obj["params"]) # params of memory. Different memories may have different params
+        return create_memory(memory_type, obj['threshold_1'], obj['threshold_2'], **obj["params"]) # params of memory. Different memories may have different params
 
 
     def _get_llm(self, obj) -> Union[BaseLLM, Dict[str, BaseLLM]]:

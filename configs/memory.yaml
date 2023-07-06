@@ -5,11 +5,13 @@ version: 0.0.1
 description: main agent leveraging OpenAI function call API.
 prompt_template: !prompt ZeroShotVanillaPrompt
 memory:
-  memory_type: chroma
-  threshold: 3
+  memory_type: chroma   # chroma or pinecone
+  threshold_1: 3        # first-level memory
+  threshold_2: 3        # second-level memory
   params:
     index: main
     top_k: 2
+    # text_key: test    # pinecone need
 llm:
   model_name: gpt-4-0613
   params:

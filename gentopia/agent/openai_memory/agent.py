@@ -21,19 +21,29 @@ from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType, AgentOutput
 from gentopia.tools.basetool import ToolMetaclass
 from gentopia.utils.cost_helpers import calculate_cost
+from .load_memory import LoadMemory
 
 
 class OpenAIMemoryChatAgent(BaseAgent):
     name: str = "OpenAIAgent"
     type: AgentType = AgentType.openai
     version: str = "NA"
-    description: str = "OpenAI Function Call Agent"
+    description: str = "OpenAI Function Call Agent with memory"
     target_tasks: list[str] = []
     llm: OpenAIGPTClient
     prompt_template: PromptTemplate = ZeroShotVanillaPrompt
-    plugins: List[Union[BaseTool, BaseAgent]] = []
+    plugins: List[Union[BaseTool, BaseAgent]]
     examples: Union[str, List[str]] = None
-    message_scratchpad: List[Dict] = [{"role": "system", "content": "You are a helpful AI assistant."}]
+
+    is_load_memory_tool = False
+    
+    def __add_system_prompt(self, messages):
+        return [{"role": "system", "content": "You are a helpful AI assistant."}] + messages
+    
+    def __add_load_memory_tool(self):
+        if self.is_load_memory_tool == False:
+            self.plugins.append(LoadMemory(memory=self.memory))
+            self.is_load_memory_tool = True
 
     def _format_plugin_schema(self, plugin: Union[BaseTool, BaseAgent]) -> Dict:
         """Format tool into the open AI function API."""
@@ -87,46 +97,58 @@ class OpenAIMemoryChatAgent(BaseAgent):
     def run(self, instruction: str, output: Optional[BaseOutput] = None) -> AgentOutput:
         if output is None:
             output = BaseOutput()
-        self.message_scratchpad.append({"role": "user", "content": instruction})
+        self.memory.clear_memory_II()
+        message_scratchpad = self.__add_system_prompt(self.memory.lastest_context(instruction))
 
+        self.__add_load_memory_tool() # add a tool to load memory
         function_map = self._format_function_map()
         function_schema = self._format_function_schema()
 
         # TODO: stream output, cost and token usage
         output.thinking(self.name)
-        response = self.llm.function_chat_completion(self.message_scratchpad, function_map, function_schema)
+        # print(message_scratchpad)
+        response = self.llm.function_chat_completion(message_scratchpad, function_map, function_schema)
         output.done()
         if response.state == "success":
             output.done(self.name)
             output.panel_print(response.content)
-            # Update message history
-            self.message_scratchpad.append(response.message_scratchpad)
+            self.memory.save_memory_I({"role": "user", "content": instruction}, response.message_scratchpad[-1], self.llm)
+
+            if len(response.message_scratchpad) != len(message_scratchpad) + 1: # normal case
+                self.memory.save_memory_II(response.message_scratchpad[-3], response.message_scratchpad[-2],  self.llm)       
+            
             return AgentOutput(
                 output=response.content,
                 cost=0,
                 token_usage=0
             )
 
-    def stream(self, instruction: Optional[str] = None, output: Optional[BaseOutput] = None):
+    def stream(self, instruction: Optional[str] = None, output: Optional[BaseOutput] = None, is_start: Optional[bool] = True):
         if output is None:
             output = BaseOutput()
         output.thinking(self.name)
-        if instruction is not None:
-            self.message_scratchpad.append({"role": "user", "content": instruction})
-        output.debug(self.message_scratchpad)
-        assert len(self.message_scratchpad) > 1
+        if is_start:
+            self.memory.clear_memory_II()
+        message_scratchpad = self.__add_system_prompt(self.memory.lastest_context(instruction))
+        output.debug(message_scratchpad)
+        assert len(message_scratchpad) > 1
+
+        self.__add_load_memory_tool() # add a tool to load memory
         function_map = self._format_function_map()
         function_schema = self._format_function_schema()
-        response = self.llm.function_chat_stream_completion(self.message_scratchpad, function_map, function_schema)
+        # print(message_scratchpad)
+        response = self.llm.function_chat_stream_completion(message_scratchpad, function_map, function_schema)
 
         ans = []
         _type = ''
+        _role = ''
         for _t, item in response:
             if _type == '':
                 output.done()
                 output.print(f"[blue]{self.name}: ")
             _type = _t
             ans.append(item.content)
+            _role = item.role 
             output.panel_print(item.content, f"[green] Response of [blue]{self.name}: ", True)
         if _type == "function_call":
             ans.append('}')
@@ -150,12 +172,14 @@ class OpenAIMemoryChatAgent(BaseAgent):
             if isinstance(function_response, AgentOutput):
                 function_response = function_response.output
             output.panel_print(function_response, f"[green] Function Response of [blue]{function_name}: ")
-            self.message_scratchpad.append(
-                dict(role='assistant', content=None, function_call={i: str(j) for i, j in result.items()}))
-            self.message_scratchpad.append({"role": "function",
+
+            self.memory.save_memory_II(dict(role='assistant', content=None, function_call={i: str(j) for i, j in result.items()}),
+                                            {"role": "function",
                                             "name": function_name,
-                                            "content": function_response})
-            self.stream(output=output)
+                                            "content": function_response}, self.llm)
+            self.stream(instruction, output=output, is_start=False)
+        else:
+            self.memory.save_memory_I({"role": "user", "content": instruction}, {"role": _role, "content": result}, self.llm)
         # else:
         #     self.message_scratchpad.append({"role": "user", "content": "Summarize what you have done and continue if you have not finished."})
         #     self.stream(output=output)
