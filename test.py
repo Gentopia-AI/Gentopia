@@ -75,14 +75,15 @@ if __name__ == '__main__':
     enable_log(log_level='debug')
 
     assembler = AgentAssembler(file='configs/react.yaml')
+
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
+    # ask(agent)
     #
     # print(agent)
     # x = " What is Trump's current age raised to the 0.43 power?"
     # agent.run(x)
     # exit(0)
-    ask(agent)
 
     # print(agent.llm.stream_chat_completion("1+1=?"))
     # print(agent.run("print hello world"))

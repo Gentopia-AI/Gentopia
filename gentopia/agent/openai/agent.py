@@ -35,6 +35,12 @@ class OpenAIFunctionChatAgent(BaseAgent):
     examples: Union[str, List[str]] = None
     message_scratchpad: List[Dict] = [{"role": "system", "content": "You are a helpful AI assistant."}]
 
+    def initialize_system_message(self, msg):
+        """Initialize the system message to openai api."""
+        if len(self.message_scratchpad) > 1:
+            raise ValueError("System message must be initialized before run")
+        self.message_scratchpad[0]["content"] = msg
+
     def _format_plugin_schema(self, plugin: Union[BaseTool, BaseAgent]) -> Dict:
         """Format tool into the open AI function API."""
         if isinstance(plugin, BaseTool):
@@ -80,11 +86,12 @@ class OpenAIFunctionChatAgent(BaseAgent):
         if output is None:
             output = BaseOutput()
         self.message_scratchpad.append({"role": "user", "content": instruction})
+        total_cost = 0
+        total_token = 0
 
         function_map = self._format_function_map()
         function_schema = self._format_function_schema()
 
-        # TODO: stream output, cost and token usage
         output.thinking(self.name)
         response = self.llm.function_chat_completion(self.message_scratchpad, function_map, function_schema)
         output.done()
@@ -93,10 +100,13 @@ class OpenAIFunctionChatAgent(BaseAgent):
             output.panel_print(response.content)
             # Update message history
             self.message_scratchpad.append(response.message_scratchpad)
+            total_cost += calculate_cost(self.llm.model_name, response.prompt_token,
+                                         response.completion_token) + response.plugin_cost
+            total_token += response.prompt_token + response.completion_token + response.plugin_token
             return AgentOutput(
                 output=response.content,
-                cost=0,
-                token_usage=0
+                cost=total_cost,
+                token_usage=total_token,
             )
 
     def stream(self, instruction: Optional[str] = None, output: Optional[BaseOutput] = None):
@@ -151,4 +161,3 @@ class OpenAIFunctionChatAgent(BaseAgent):
         # else:
         #     self.message_scratchpad.append({"role": "user", "content": "Summarize what you have done and continue if you have not finished."})
         #     self.stream(output=output)
-
