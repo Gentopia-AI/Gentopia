@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Dict
 
+
 class BaseCompletion(BaseModel):
     state: str  # "success" or "error"
     content: str
@@ -21,4 +22,7 @@ class ChatCompletion(BaseCompletion):
 
 
 class ChatCompletionWithHistory(ChatCompletion):
-    message_scratchpad: List[Dict]
+    """Used for function call API"""
+    message_scratchpad: List[Dict] = []
+    plugin_cost: float = 0.0
+    plugin_token: float = 0.0

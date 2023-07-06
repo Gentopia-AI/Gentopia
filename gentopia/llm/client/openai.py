@@ -40,8 +40,8 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
             )
             return BaseCompletion(state="success",
                                   content=response.choices[0].message["content"],
-                                  prompt_token=response.usage["prompt_tokens"],
-                                  completion_token=response.usage["completion_tokens"])
+                                  prompt_token=response.get("usage", {}).get("prompt_tokens", 0),
+                                  completion_token=response.get("usage", {}).get("completion_tokens", 0))
         except Exception as exception:
             print("Exception:", exception)
             return BaseCompletion(state="error", content=exception)
@@ -61,8 +61,8 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
             return ChatCompletion(state="success",
                                   role=response.choices[0].message["role"],
                                   content=response.choices[0].message["content"],
-                                  prompt_token=response.usage["prompt_tokens"],
-                                  completion_token=response.usage["completion_tokens"])
+                                  prompt_token=response.get("usage", {}).get("prompt_tokens", 0),
+                                  completion_token=response.get("usage", {}).get("completion_tokens", 0))
         except Exception as exception:
             print("Exception:", exception)
             return ChatCompletion(state="error", content=exception)
@@ -82,7 +82,7 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
             )
             role = next(response).choices[0].delta["role"]
             messages = []
-            ## TODO: Calculate prompt_token and completion_token
+            ## TODO: Calculate prompt_token and for stream mode
             for resp in response:
                 messages.append(resp.choices[0].delta.get("content", ""))
                 yield ChatCompletion(state="success",
@@ -94,7 +94,6 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
             print("Exception:", exception)
             return ChatCompletion(state="error", content=exception)
 
-    # TODO: Stream version, send to server once 'message' is updated
     def function_chat_completion(self, message: List[dict],
                                  function_map: Dict[str, Callable],
                                  function_schema: List[Dict]) -> ChatCompletionWithHistory:
@@ -120,8 +119,15 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
                 function_response = fuction_to_call(**function_args)
 
                 # Postprocess function response
-                if isinstance(function_response, AgentOutput):
+                if isinstance(function_response, str):
+                    plugin_cost = 0
+                    plugin_token = 0
+                elif isinstance(function_response, AgentOutput):
+                    plugin_cost = function_response.cost
+                    plugin_token = function_response.token_usage
                     function_response = function_response.output
+                else:
+                    raise Exception("Invalid tool response type. Must be on of [AgentOutput, str]")
 
                 message.append(dict(response_message))
                 message.append({"role": "function",
@@ -135,17 +141,26 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
                 return ChatCompletionWithHistory(state="success",
                                                  role=second_response.choices[0].message["role"],
                                                  content=second_response.choices[0].message["content"],
-                                                 message_scratchpad=message)
+                                                 prompt_token=response.get("usage", {}).get("prompt_tokens", 0) +
+                                                              second_response.get("usage", {}).get("prompt_tokens", 0),
+                                                 completion_token=response.get("usage", {}).get("completion_tokens", 0) +
+                                                                  second_response.get("usage", {}).get("completion_tokens", 0),
+                                                 message_scratchpad=message,
+                                                 plugin_cost=plugin_cost,
+                                                 plugin_token=plugin_token,
+                                                 )
             else:
                 message.append(dict(response_message))
                 return ChatCompletionWithHistory(state="success",
                                                  role=response.choices[0].message["role"],
                                                  content=response.choices[0].message["content"],
+                                                 prompt_token=response.get("usage", {}).get("prompt_tokens", 0),
+                                                 completion_token=response.get("usage", {}).get("completion_tokens", 0),
                                                  message_scratchpad=message)
 
         except Exception as exception:
             print("Exception:", exception)
-            return ChatCompletion(state="error", content=str(exception))
+            return ChatCompletionWithHistory(state="error", content=str(exception))
 
     def function_chat_stream_completion(self, message: List[dict],
                                         function_map: Dict[str, Callable],

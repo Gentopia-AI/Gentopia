@@ -78,15 +78,16 @@ if __name__ == '__main__':
     enable_log(log_level='info')
     load_dotenv('.env')
 
-    assembler = AgentAssembler(file='configs/main.yaml')
+    assembler = AgentAssembler(file='configs/mathria.yaml')
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
+    # ask(agent)
     #
     # print(agent)
-    # x = "How old is trump?"
-    # agent.run(x)
+    #x = "Who is Leo DiCaprio's girlfriend? What is her current age raised to the 0.43 power?"
+    x = "if 2x=3, what is x^3?"
+    print(agent.run(x))
     # exit(0)
-    ask(agent)
 
     # print(agent.llm.stream_chat_completion("1+1=?"))
     # print(agent.run("print hello world"))
