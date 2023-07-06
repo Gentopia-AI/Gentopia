@@ -3,6 +3,11 @@
 The brain of Agents. It uses a strong LLM for chained reasoning, whereas each reasoning step is assigned to an config-driven, lightweight and specialzed Agent from Gentopia-AI/GentPool.
 
 
+<p align="center">
+  <img width="400" height="400" src="https://github.com/Gentopia-AI/Gentopia/assets/65674752/a81e48cd-0bb4-4e2e-a05b-430be8377ef8">
+</p>
+
+
 CORE FEATURES.
 - Gentopia, should provide various stable base LLMs, including API-driven ones like `gpt-4`, and open LLMs.
 - Gentopia should provide well-organized prompt template supporting in-context instructions everywhere.
