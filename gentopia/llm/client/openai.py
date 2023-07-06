@@ -67,7 +67,7 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
             print("Exception:", exception)
             return ChatCompletion(state="error", content=exception)
 
-    def stream_chat_completion(self, message: List[dict]):
+    def stream_chat_completion(self, message: List[dict],  **kwargs):
         try:
             response = openai.ChatCompletion.create(
                 n=self.params.n,
@@ -78,7 +78,8 @@ class OpenAIGPTClient(BaseLLM, BaseModel):
                 top_p=self.params.top_p,
                 frequency_penalty=self.params.frequency_penalty,
                 presence_penalty=self.params.presence_penalty,
-                stream=True
+                stream=True,
+                **kwargs
             )
             role = next(response).choices[0].delta["role"]
             messages = []

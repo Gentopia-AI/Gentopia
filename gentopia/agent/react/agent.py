@@ -4,6 +4,8 @@ from typing import List, Union, Optional, Type, Tuple
 
 from langchain import PromptTemplate
 from langchain.schema import AgentFinish
+
+from gentopia.output.base_output import BaseOutput
 from gentopia.tools.basetool import BaseTool
 from pydantic import create_model, BaseModel
 
@@ -75,6 +77,7 @@ class ReactAgent(BaseAgent):
             if tool_input.startswith("SELECT ") is False:
                 tool_input = tool_input.strip('"')
 
+
             return AgentAction(action, tool_input, text)
 
         elif includes_answer:
@@ -117,19 +120,69 @@ class ReactAgent(BaseAgent):
         total_cost = 0.0
         total_token = 0
 
-        prompt = self._compose_prompt(instruction)
-        logging.info(f"Prompt: {prompt}")
-        response = self.llm.completion(prompt)
-        if response.state == "error":
-            print("Planner failed to retrieve response from LLM")
-            raise ValueError("Planner failed to retrieve response from LLM")
+        for _ in range(10):
 
-        print(f"Planner run successful.")
-        total_cost += calculate_cost(self.llm.model_name, response.prompt_token,
-                                     response.completion_token)
-        total_token += response.prompt_token + response.completion_token
-        self.intermediate_steps.append(self._parse_output(response.content))
+            prompt = self._compose_prompt(instruction)
+            logging.info(f"Prompt: {prompt}")
+            response = self.llm.completion(prompt, stop=["Observation:"])
+            if response.state == "error":
+                print("Planner failed to retrieve response from LLM")
+                raise ValueError("Planner failed to retrieve response from LLM")
+
+            logging.info(f"Response: {response.content}")
+            total_cost += calculate_cost(self.llm.model_name, response.prompt_token,
+                                         response.completion_token)
+            total_token += response.prompt_token + response.completion_token
+            self.intermediate_steps.append([self._parse_output(response.content),])
+            if isinstance(self.intermediate_steps[-1][0], AgentFinish):
+                break
+            action = self.intermediate_steps[-1][0].tool
+            tool_input = self.intermediate_steps[-1][0].tool_input
+            logging.info(f"Action: {action}")
+            logging.info(f"Tool Input: {tool_input}")
+            result = self._format_function_map()[action](tool_input)
+            logging.info(f"Result: {result}")
+            self.intermediate_steps[-1].append(result)
         return AgentOutput(output=response.content, cost=total_cost, token_usage=total_token)
 
-    def stream(self, *args, **kwargs) -> AgentOutput:
-        pass
+    def stream(self, instruction: Optional[str] = None, output: Optional[BaseOutput] = None):
+        total_cost = 0.0
+        total_token = 0
+        if output is None:
+            output = BaseOutput()
+        output.thinking(self.name)
+        for _ in range(10):
+
+            prompt = self._compose_prompt(instruction)
+            logging.info(f"Prompt: {prompt}")
+            response = self.llm.stream_chat_completion([{"role": "user", "content": prompt}], stop=["Observation:"])
+            output.done()
+            content = ""
+            output.print(f"[blue]{self.name}: ")
+            for i in response:
+                content += i.content
+                output.panel_print(i.content, self.name, True)
+
+                # print(i.content)
+            output.clear()
+
+
+
+            logging.info(f"Response: {content}")
+            self.intermediate_steps.append([self._parse_output(content), ])
+            if isinstance(self.intermediate_steps[-1][0], AgentFinish):
+                break
+
+            action = self.intermediate_steps[-1][0].tool
+            tool_input = self.intermediate_steps[-1][0].tool_input
+            logging.info(f"Action: {action}")
+            logging.info(f"Tool Input: {tool_input}")
+            output.update_status("Calling function: {} ...".format(action))
+            result = self._format_function_map()[action](tool_input)
+            output.done()
+            logging.info(f"Result: {result}")
+            if isinstance(result, AgentOutput):
+                result = result.output
+            output.panel_print(result, f"[green] Function Response of [blue]{action}: ")
+            self.intermediate_steps[-1].append(result)
+        return AgentOutput(output=content, cost=total_cost, token_usage=total_token)

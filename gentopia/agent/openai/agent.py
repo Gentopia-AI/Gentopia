@@ -73,15 +73,7 @@ class OpenAIFunctionChatAgent(BaseAgent):
                 "parameters": parameters,
             }
 
-    def _format_function_map(self) -> Dict[str, Callable]:
-        # Map the function name to the real function object.
-        function_map = {}
-        for plugin in self.plugins:
-            if isinstance(plugin, BaseTool):
-                function_map[plugin.name] = plugin._run
-            else:
-                function_map[plugin.name] = plugin.run
-        return function_map
+
 
     def _format_function_schema(self) -> List[Dict]:
         # List the function schema.
