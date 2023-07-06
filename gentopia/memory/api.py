@@ -48,6 +48,16 @@ End of the summaries.
 """
 )
 
+RelatedContextPrompt = PromptTemplate(
+    input_variables=["related_history"],
+    template=
+"""
+Here are some related conversations which may help you to answer the question:
+{related_history}
+End of the related history.
+"""
+)
+
 @pydantic.dataclasses.dataclass(config=Config)
 class MemoryWrapper:
     memory: BaseMemory
@@ -94,9 +104,12 @@ class MemoryWrapper:
         for i in list(self.history_queue_I.queue):
             context_history.append(i[0])
             context_history.append(i[1])
-        context_history.append({"role": "user", "content": instruction})
+        related_history = self.load_history(instruction)
+        if related_history != "":
+            instruction += "\n" + RelatedContextPrompt.format(related_history=related_history)
         if self.summary_II != "":
-            context_history.append({"role": "user", "content": RecallPrompt.format(summary = self.summary_II)})
+            instruction += "\n" + RecallPrompt.format(summary = self.summary_II)
+        context_history.append({"role": "user", "content": instruction})
         for i in list(self.history_queue_II.queue):
             context_history.append(i[0])
             context_history.append(i[1])
