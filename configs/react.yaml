@@ -11,6 +11,7 @@ llm:
     top_p: 0.9
     repetition_penalty: 1.0
     max_tokens: 1024
+    stop: ["Observation:"]
 target_tasks:
   - anything
 plugins:
@@ -32,7 +33,7 @@ plugins:
 
 
 ## Authentication
-#auth:
-#  OPENAI_API_KEY: !file /home/api.key
-#  WOLFRAM_ALPHA_APPID: !file /home/wolfram.key
+auth:
+  OPENAI_API_KEY: !file /home/api.key
+  WOLFRAM_ALPHA_APPID: !file /home/wolfram.key
 

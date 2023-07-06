@@ -1,6 +1,6 @@
 import io
 from abc import ABC, abstractmethod
-from typing import List, Dict, Union, Any, Optional, Type
+from typing import List, Dict, Union, Any, Optional, Type, Callable
 
 from langchain import PromptTemplate
 from pydantic import BaseModel, create_model
@@ -9,6 +9,8 @@ from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType, AgentOutput
 
 from rich import print as rprint
+
+from gentopia.tools import BaseTool
 
 
 class BaseAgent(ABC, BaseModel):
@@ -46,3 +48,13 @@ class BaseAgent(ABC, BaseModel):
         result = io.StringIO()
         rprint(self, file=result)
         return result.getvalue()
+
+    def _format_function_map(self) -> Dict[str, Callable]:
+        # Map the function name to the real function object.
+        function_map = {}
+        for plugin in self.plugins:
+            if isinstance(plugin, BaseTool):
+                function_map[plugin.name] = plugin._run
+            else:
+                function_map[plugin.name] = plugin.run
+        return function_map

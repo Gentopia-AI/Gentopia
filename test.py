@@ -74,19 +74,19 @@ if __name__ == '__main__':
     # exit(0)give me some sentences in markdown format
     enable_log(log_level='debug')
 
-    assembler = AgentAssembler(file='configs/main.yaml')
+    assembler = AgentAssembler(file='configs/react.yaml')
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
     #
     # print(agent)
-    # x = "How old is trump?"
+    # x = " What is Trump's current age raised to the 0.43 power?"
     # agent.run(x)
     # exit(0)
     ask(agent)
 
     # print(agent.llm.stream_chat_completion("1+1=?"))
     # print(agent.run("print hello world"))
-    # print(agent.plugins)
+    # print(agent.plugins)https://en.wikipedia.org/wiki/Camila_Morrone
 # import time
 from transformers.models.llama.modeling_llama import LlamaForCausalLM
 # from gentopia.llm import HuggingfaceLLMClient
