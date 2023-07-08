@@ -4,7 +4,7 @@ from gentopia.agent.base_agent import BaseAgent
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType
 from gentopia.output.base_output import BaseOutput
-from gentopia.prompt.vanilla import *
+from gentopia.prompts.vanilla import *
 from gentopia.utils.cost_helpers import *
 from gentopia.utils.text_helpers import *
 

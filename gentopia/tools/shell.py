@@ -56,7 +56,7 @@ class BashProcess:
         process = pexpect.spawn(
             "env", ["-i", "bash", "--norc", "--noprofile"], encoding="utf-8"
         )
-        # Set the custom prompt
+        # Set the custom prompts
         process.sendline("PS1=" + prompt)
 
         process.expect_exact(prompt, timeout=10)

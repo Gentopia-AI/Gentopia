@@ -1,5 +1,5 @@
 from gentopia.model.param_model import BaseParamModel
-from gentopia.prompt import fewshots
+from gentopia.prompts import fewshots
 
 # OPENAI_COMPLETION_MODELS = ["text-davinci-003"]
 # OPENAI_CHAT_MODELS = ["gpt-3.5-turbo", "gpt-4"]

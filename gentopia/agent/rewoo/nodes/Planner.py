@@ -6,7 +6,7 @@ from gentopia.agent.base_agent import BaseAgent
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.completion_model import BaseCompletion
 from gentopia.output.base_output import BaseOutput
-from gentopia.prompt.rewoo import *
+from gentopia.prompts.rewoo import *
 from gentopia.tools import BaseTool
 import logging
 
@@ -20,7 +20,7 @@ class Planner(BaseModel):
 
     def _compose_worker_description(self) -> str:
         """
-        Compose the worker prompt from the workers.
+        Compose the worker prompts from the workers.
 
         Example:
         toolname1[input]: tool1 description
@@ -44,7 +44,7 @@ class Planner(BaseModel):
 
     def _compose_prompt(self, instruction) -> str:
         """
-        Compose the prompt from template, worker description, examples and instruction.
+        Compose the prompts from template, worker description, examples and instruction.
         """
         worker_desctription = self._compose_worker_description()
         fewshot = self._compose_fewshot_prompt()

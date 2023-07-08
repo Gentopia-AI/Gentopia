@@ -18,7 +18,7 @@ class WrapLLM(BaseLLM):
 
     def completion(self, prompt) -> BaseCompletion:
         url = f"http://{self.server.host}:{self.server.port}/completion"
-        data = {"prompt": prompt}
+        data = {"prompts": prompt}
         response = requests.post(url, params=data, timeout=3000)
         x = response.json()
         print(x)
@@ -29,7 +29,7 @@ class WrapLLM(BaseLLM):
 
     def stream_chat_completion(self, prompt) -> BaseCompletion:
         url = f"http://{self.server.host}:{self.server.port}/stream_chat_completion"
-        data = {"prompt": prompt}
+        data = {"prompts": prompt}
         generated_text = ""
         try:
             with requests.post(url, params=data, stream=True, timeout=3000) as r:

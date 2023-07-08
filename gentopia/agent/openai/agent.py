@@ -10,7 +10,7 @@ from langchain import PromptTemplate
 from langchain.schema import AgentFinish
 
 from gentopia.output.base_output import BaseOutput
-from gentopia.prompt import ZeroShotVanillaPrompt
+from gentopia.prompts import ZeroShotVanillaPrompt
 from gentopia.tools import BaseTool
 from pydantic import create_model, BaseModel
 

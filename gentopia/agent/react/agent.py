@@ -34,7 +34,7 @@ class ReactAgent(BaseAgent):
 
     def _compose_plugin_description(self) -> str:
         """
-        Compose the worker prompt from the workers.
+        Compose the worker prompts from the workers.
 
         Example:
         toolname1[input]: tool1 description
@@ -100,13 +100,13 @@ class ReactAgent(BaseAgent):
 
     def _compose_prompt(self, instruction) -> str:
         """
-        Compose the prompt from template, worker description, examples and instruction.
+        Compose the prompts from template, worker description, examples and instruction.
         """
         agent_scratchpad = self._construct_scratchpad(self.intermediate_steps)
         tool_description = self._compose_plugin_description()
         tool_names = ", ".join([plugin.name for plugin in self.plugins])
         if self.prompt_template is None:
-            from gentopia.prompt.react import ZeroShotReactPrompt
+            from gentopia.prompts.react import ZeroShotReactPrompt
             self.prompt_template = ZeroShotReactPrompt
         return self.prompt_template.format(
             instruction=instruction,

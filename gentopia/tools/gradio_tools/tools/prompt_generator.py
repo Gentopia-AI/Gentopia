@@ -10,10 +10,10 @@ class StableDiffusionPromptGeneratorTool(GradioTool):
         self,
         name="StableDiffusionPromptGenerator",
         description=(
-            "Use this tool to improve a prompt for stable diffusion and other image and video generators. "
-            "This tool will refine your prompt to include key words and phrases that make "
-            "stable diffusion and other art generation algorithms perform better. The input is a prompt text string "
-            "and the output is a prompt text string"
+            "Use this tool to improve a prompts for stable diffusion and other image and video generators. "
+            "This tool will refine your prompts to include key words and phrases that make "
+            "stable diffusion and other art generation algorithms perform better. The input is a prompts text string "
+            "and the output is a prompts text string"
         ),
         src="microsoft/Promptist",
         hf_token=None,

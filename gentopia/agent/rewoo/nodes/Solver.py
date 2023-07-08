@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.completion_model import BaseCompletion
 from gentopia.output.base_output import BaseOutput
-from gentopia.prompt.rewoo import *
+from gentopia.prompts.rewoo import *
 import logging
 
 
@@ -25,7 +25,7 @@ class Solver(BaseModel):
 
     def _compose_prompt(self, instruction, plan_evidence) -> str:
         """
-        Compose the prompt from template, plan&evidence, examples and instruction.
+        Compose the prompts from template, plan&evidence, examples and instruction.
         """
         fewshot = self._compose_fewshot_prompt()
         if self.prompt_template is not None:

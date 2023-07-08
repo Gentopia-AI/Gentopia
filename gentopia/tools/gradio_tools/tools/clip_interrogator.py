@@ -13,8 +13,8 @@ class ClipInterrogatorTool(GradioTool):
         self,
         name="ClipInterrogator",
         description=(
-            "A tool for reverse engineering a prompt from a source image. "
-            "Use this tool to create a prompt for StableDiffusion that matches the "
+            "A tool for reverse engineering a prompts from a source image. "
+            "Use this tool to create a prompts for StableDiffusion that matches the "
             "input image. The imput is a path to an image. The output is a text string."
         ),
         src="pharma/CLIP-Interrogator",

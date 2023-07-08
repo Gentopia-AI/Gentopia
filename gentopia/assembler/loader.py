@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Any, IO
-from gentopia.prompt import *
+from gentopia.prompts import *
 from gentopia.tools.basetool import BaseTool
 import yaml
 import os
@@ -12,7 +12,7 @@ class Loader(yaml.SafeLoader):
         self._root = Path(stream.name).resolve().parent
         super(Loader, self).__init__(stream)
         self.add_constructor("!include", Loader.include)
-        self.add_constructor("!prompt", Loader.prompt)
+        self.add_constructor("!prompts", Loader.prompt)
         self.add_constructor("!tool", Loader.tool)
         self.add_constructor("!env", Loader.env)
         self.add_constructor("!file", Loader.file)

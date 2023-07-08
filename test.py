@@ -9,7 +9,7 @@ from gentopia.assembler.config import Config
 from gentopia.llm import HuggingfaceLLMClient
 from gentopia.manager.local_llm_manager import LocalLLMManager
 from transformers import GenerationConfig
-
+import dotenv
 from gentopia.model.param_model import HuggingfaceParamModel
 from gentopia.output import enable_log
 from gentopia.output.console_output import ConsoleOutput
@@ -73,12 +73,13 @@ if __name__ == '__main__':
     # print(config)calculate sqrt(10),then tell me what is GIL in python, and then calculate sqrt(100)
     # exit(0)give me some sentences in markdown format
     enable_log(log_level='debug')
+    dotenv.load_dotenv(".env")
 
-    assembler = AgentAssembler(file='configs/react.yaml')
+    assembler = AgentAssembler(file='configs/mathria.yaml')
 
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
-    # ask(agent)
+    ask(agent)
     #
     # print(agent)
     # x = " What is Trump's current age raised to the 0.43 power?"

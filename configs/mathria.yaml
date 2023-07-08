@@ -20,7 +20,7 @@ llm:
       top_p: 0.9
       repetition_penalty: 1.0
       max_tokens: 1024
-#prompt_template: !prompt ZeroShotVanillaPrompt
+#prompt_template: !prompts ZeroShotVanillaPrompt
 #llm:
 #  model_name: gpt-3.5-turbo-0613
 #  params:

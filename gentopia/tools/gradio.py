@@ -88,7 +88,7 @@ class AudioToText(BaseTool):
 
 class ImageToPrompt(BaseTool):
     name = "Image2Prompt"
-    description = "creating a prompt for StableDiffusion that matches the input image"
+    description = "creating a prompts for StableDiffusion that matches the input image"
     args_schema: Optional[Type[BaseModel]] = create_model("Image2PromptArgs", path_to_image=(str, ...))
 
     def _run(self, path_to_image: AnyStr) -> Any:
@@ -107,7 +107,7 @@ class ImageToPrompt(BaseTool):
 #     return at.run(input)
 # @tool.get("/get_imgprompt")
 # def imgprompt(input : str)-> str:
-#     '''Creating a prompt for StableDiffusion that matches the input image.
+#     '''Creating a prompts for StableDiffusion that matches the input image.
 #     '''
 #     ci = ClipInterrogatorTool()
 #     return ci.run(input)

@@ -32,7 +32,7 @@ class TTS(BaseTool):
 #     return ic.run(input)
 # @tool.get("/get_promptgenerator")
 # def promptgenerator(input : str)-> str:
-#     '''Generating a prompt for stable diffusion and other image and video generators based on text input.
+#     '''Generating a prompts for stable diffusion and other image and video generators based on text input.
 #     '''
 #     pg = StableDiffusionPromptGeneratorTool()
 #     return pg.run(input)
@@ -62,7 +62,7 @@ class TTS(BaseTool):
 #     return at.run(input)
 # @tool.get("/get_imgprompt")
 # def imgprompt(input : str)-> str:
-#     '''Creating a prompt for StableDiffusion that matches the input image.
+#     '''Creating a prompts for StableDiffusion that matches the input image.
 #     '''
 #     ci = ClipInterrogatorTool()
 #     return ci.run(input)

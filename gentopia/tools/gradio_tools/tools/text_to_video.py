@@ -15,7 +15,7 @@ class TextToVideoTool(GradioTool):
         description=(
             "A tool for creating videos from text."
             "Use this tool to create videos from text prompts. "
-            "Input will be a text prompt describing a video scene. "
+            "Input will be a text prompts describing a video scene. "
             "The output will be a path to a video file."
         ),
         src="damo-vilab/modelscope-text-to-video-synthesis",
