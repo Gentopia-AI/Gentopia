@@ -21,10 +21,11 @@ from gentopia.llm.base_llm import BaseLLM
 from gentopia.model.agent_model import AgentType, AgentOutput
 from gentopia.tools.basetool import ToolMetaclass
 from gentopia.utils.cost_helpers import calculate_cost
+from gentopia.agent.openai import OpenAIFunctionChatAgent
 from .load_memory import LoadMemory
 
 
-class OpenAIMemoryChatAgent(BaseAgent):
+class OpenAIMemoryChatAgent(OpenAIFunctionChatAgent):
     name: str = "OpenAIAgent"
     type: AgentType = AgentType.openai
     version: str = "NA"
