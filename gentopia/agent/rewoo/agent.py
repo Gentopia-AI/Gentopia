@@ -89,9 +89,11 @@ class RewooAgent(BaseAgent):
                 else:
                     evidences[e] = "No evidence found"
         level = [list(evidences.keys())]
-        #TODO: There's a bug in level. Fix it and support parallel execution of workers
+        #TODO: Fix this
+
         # while num > 0:
         #     level.append([])
+        #     print(dependence)
         #     for i in dependence:
         #         if dependence[i] is None:
         #             continue
@@ -99,15 +101,16 @@ class RewooAgent(BaseAgent):
         #             level[-1].append(i)
         #             num -= 1
         #             for j in dependence:
-        #                 if j is not None and i in dependence[j]:
+        #                 if dependence[j] is not None and i in dependence[j]:
         #                     dependence[j].remove(i)
         #                     if len(dependence[j]) == 0:
         #                         dependence[j] = None
-
+        # print(level)
         return evidences, level
 
     def _get_worker_evidence(self, planner_evidences, evidences_level, output=BaseOutput()):
         worker_evidences = dict()
+        plugin_cost, plugin_token = 0.0, 0.0
         for level in evidences_level:
             # TODO: Run simultaneously
             for e in level:
@@ -122,12 +125,17 @@ class RewooAgent(BaseAgent):
                     if var in worker_evidences:
                         tool_input = tool_input.replace(var, "[" + worker_evidences.get(var, "") + "]")
                 try:
-                    worker_evidences[e] = get_plugin_response_content(self._find_plugin(tool).run(to0ol_input))
+                    tool_response = self._find_plugin(tool).run(tool_input)
+                    # cumulate agent-as-plugin costs and tokens.
+                    if isinstance(tool_response, AgentOutput):
+                        plugin_cost += tool_response.cost
+                        plugin_token += tool_response.token_usage
+                    worker_evidences[e] = get_plugin_response_content(tool_response)
                 except:
                     worker_evidences[e] = "No evidence found."
                 finally:
                     output.panel_print(worker_evidences[e], f"[green] Function Response of [blue]{tool}: ")
-        return worker_evidences
+        return worker_evidences, plugin_cost, plugin_token
 
     def _find_plugin(self, name: str):
         for p in self.plugins:
@@ -159,7 +167,7 @@ class RewooAgent(BaseAgent):
         planner_evidences, evidence_level = self._parse_planner_evidences(planner_output.content)
 
         # Work
-        worker_evidences = self._get_worker_evidence(planner_evidences, evidence_level)
+        worker_evidences, plugin_cost, plugin_token = self._get_worker_evidence(planner_evidences, evidence_level)
         worker_log = ""
         for plan in plan_to_es:
             worker_log += f"{plan}: {plans[plan]}\n"
@@ -169,8 +177,8 @@ class RewooAgent(BaseAgent):
         # Solve
         solver_output = solver.run(instruction, worker_log)
         total_cost += calculate_cost(solver_llm.model_name, solver_output.prompt_token,
-                                     solver_output.completion_token)
-        total_token += solver_output.prompt_token + solver_output.completion_token
+                                     solver_output.completion_token) + plugin_cost
+        total_token += solver_output.prompt_token + solver_output.completion_token + plugin_token
 
         return AgentOutput(output=solver_output.content, cost=total_cost, token_usage=total_token)
 
@@ -203,7 +211,7 @@ class RewooAgent(BaseAgent):
         plan_to_es, plans = self._parse_plan_map(planner_output)
         planner_evidences, evidence_level = self._parse_planner_evidences(planner_output)
 
-        worker_evidences = self._get_worker_evidence(planner_evidences, evidence_level, output=output)
+        worker_evidences, _, _ = self._get_worker_evidence(planner_evidences, evidence_level, output=output)
         worker_log = ""
         for plan in plan_to_es:
             worker_log += f"{plan}: {plans[plan]}\n"

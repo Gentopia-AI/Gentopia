@@ -1,7 +1,9 @@
-from typing import Union, Dict, Optional
 import os
+from typing import Union, Dict, Optional
+
 import torch.cuda
 from langchain import PromptTemplate
+
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.assembler.config import Config
 from gentopia.llm import HuggingfaceLLMClient, OpenAIGPTClient
@@ -15,8 +17,6 @@ from gentopia.tools import BaseTool
 from gentopia.tools.basetool import ToolMetaclass
 from gentopia.memory.api import MemoryWrapper
 from gentopia.memory.api import create_memory
-
-# TODO: Install GentPool and load custom agents here.
 
 class AgentAssembler:
     def __init__(self, file=None, config=None):
@@ -67,7 +67,7 @@ class AgentAssembler:
         assert isinstance(obj, dict) or isinstance(obj, str)
         if isinstance(obj, dict) and ("model_name" not in obj):
             return {
-                #list(item.keys())[0]: self._parse_llm(list(item.values())[0]) for item in obj
+                # list(item.keys())[0]: self._parse_llm(list(item.values())[0]) for item in obj
                 key: self._parse_llm(obj[key]) for key in obj
             }
         else:
