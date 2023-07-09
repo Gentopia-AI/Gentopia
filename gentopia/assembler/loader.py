@@ -1,3 +1,4 @@
+import importlib
 from pathlib import Path
 from typing import Any, IO
 from gentopia.prompt import *
@@ -26,7 +27,12 @@ class Loader(yaml.SafeLoader):
 
     def prompt(self, node: yaml.Node) -> Any:
         prompt = self.construct_scalar(node)
-        prompt_cls = eval(prompt)
+        if '.' in prompt:
+            _path = prompt.split('.')
+            module = importlib.import_module('.'.join(_path[:-1]))
+            prompt_cls = getattr(module, _path[-1])
+        else:
+            prompt_cls = eval(prompt)
         assert issubclass(prompt_cls.__class__, PromptTemplate)
         return prompt_cls
 
