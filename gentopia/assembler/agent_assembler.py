@@ -15,7 +15,8 @@ from gentopia.model.param_model import OpenAIParamModel, HuggingfaceParamModel
 from gentopia.tools import *
 from gentopia.tools import BaseTool
 from gentopia.tools.basetool import ToolMetaclass
-
+from gentopia.memory.api import MemoryWrapper
+from gentopia.memory.api import create_memory
 
 class AgentAssembler:
     def __init__(self, file=None, config=None):
@@ -50,9 +51,17 @@ class AgentAssembler:
             target_tasks=config.get('target_tasks', []),
             llm=self._get_llm(config['llm']),
             prompt_template=prompt_template,
-            plugins=self._parse_plugins(config.get('plugins', []))
+            plugins=self._parse_plugins(config.get('plugins', [])),
+            memory=self._parse_memory(config.get('memory', [])) # initialize memory
         )
         return agent
+
+    def _parse_memory(self, obj) -> MemoryWrapper:
+        if obj == []:
+            return None
+        memory_type = obj["memory_type"] # memory_type: ["pinecone"]
+        return create_memory(memory_type, obj['threshold_1'], obj['threshold_2'], **obj["params"]) # params of memory. Different memories may have different params
+
 
     def _get_llm(self, obj) -> Union[BaseLLM, Dict[str, BaseLLM]]:
         assert isinstance(obj, dict) or isinstance(obj, str)

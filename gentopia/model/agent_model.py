@@ -13,6 +13,7 @@ class AgentType(Enum):
     react = "react"
     rewoo = "rewoo"
     vanilla = "vanilla"
+    openai_memory = "openai_memory"
 
     @staticmethod
     def get_agent_class(_type: AgentType):
@@ -33,6 +34,9 @@ class AgentType(Enum):
         elif _type == AgentType.openai:
             from gentopia.agent.openai import OpenAIFunctionChatAgent
             return OpenAIFunctionChatAgent
+        elif _type == AgentType.openai_memory:
+            from gentopia.agent.openai_memory import OpenAIMemoryChatAgent
+            return OpenAIMemoryChatAgent
         else:
             raise ValueError(f"Unknown agent type: {_type}")
 
