@@ -10,7 +10,8 @@ The brain of Agents. It uses a strong LLM for chained reasoning, whereas each re
 
 CORE FEATURES.
 
-![image](https://github.com/Gentopia-AI/Gentopia/assets/65674752/5e7aa60b-1b57-41c6-a529-274d5fb74f73)
+![image](https://github.com/Gentopia-AI/Gentopia/assets/65674752/00c895fa-2b8a-422e-b226-f08688d0ebfb)
+
 
 
 - Gentopia, should provide various stable base LLMs, including API-driven ones like `gpt-4`, and open LLMs.
