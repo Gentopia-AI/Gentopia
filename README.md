@@ -10,7 +10,8 @@ The brain of Agents. It uses a strong LLM for chained reasoning, whereas each re
 
 CORE FEATURES.
 
-![image](https://github.com/Gentopia-AI/Gentopia/assets/65674752/00c895fa-2b8a-422e-b226-f08688d0ebfb)
+![image](https://github.com/Gentopia-AI/Gentopia/assets/65674752/19bcac5d-f27a-476b-b5a8-9642b6d2a011)
+
 
 
 
