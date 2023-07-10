@@ -1,9 +1,10 @@
 import logging
+import os
 import re
 from typing import List, Dict, Union, Optional
 
 from langchain import PromptTemplate
-
+from concurrent.futures import ThreadPoolExecutor
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.agent.rewoo.nodes.Planner import Planner
 from gentopia.agent.rewoo.nodes.Solver import Solver
@@ -74,67 +75,79 @@ class RewooAgent(BaseAgent):
             {"#E1": "Tool1", "#E2": "Tool2", "#E3": "Tool3", "#E4": "Tool4"}, [[#E1, #E2], [#E3, #E4]]
         """
         evidences, dependence = dict(), dict()
-        num = 0
         for line in planner_response.splitlines():
             if line.startswith("#E") and line[2].isdigit():
                 e, tool_call = line.split(":", 1)
                 e, tool_call = e.strip(), tool_call.strip()
                 if len(e) == 3:
                     dependence[e] = []
-                    num += 1
                     evidences[e] = tool_call
                     for var in re.findall(r"#E\d+", tool_call):
                         if var in evidences:
                             dependence[e].append(var)
                 else:
                     evidences[e] = "No evidence found"
-        level = [list(evidences.keys())]
-        #TODO: Fix this
+        level = []
+        while dependence:
+            select = [i for i in dependence if not dependence[i]]
+            if len(select) == 0:
+                raise ValueError("Circular dependency detected.")
+            level.append(select)
+            for item in select:
+                dependence.pop(item)
+            for item in dependence:
+                for i in select:
+                    if i in dependence[item]:
+                        dependence[item].remove(i)
 
-        # while num > 0:
-        #     level.append([])
-        #     print(dependence)
-        #     for i in dependence:
-        #         if dependence[i] is None:
-        #             continue
-        #         if len(dependence[i]) == 0:
-        #             level[-1].append(i)
-        #             num -= 1
-        #             for j in dependence:
-        #                 if dependence[j] is not None and i in dependence[j]:
-        #                     dependence[j].remove(i)
-        #                     if len(dependence[j]) == 0:
-        #                         dependence[j] = None
-        # print(level)
         return evidences, level
+
+
+    def _run_plugin(self, e, planner_evidences, worker_evidences, output=BaseOutput()):
+        result = dict(e=e, plugin_cost=0, plugin_token=0, evidence="")
+        tool_call = planner_evidences[e]
+        if "[" not in tool_call:
+            result['evidence'] = tool_call
+        else:
+            tool, tool_input = tool_call.split("[", 1)
+            tool_input = tool_input[:-1]
+            # find variables in input and replace with previous evidences
+            for var in re.findall(r"#E\d+", tool_input):
+                if var in worker_evidences:
+                    tool_input = tool_input.replace(var, "[" + worker_evidences.get(var, "") + "]")
+            try:
+                tool_response = self._find_plugin(tool).run(tool_input)
+                # cumulate agent-as-plugin costs and tokens.
+                if isinstance(tool_response, AgentOutput):
+                    result['plugin_cost'] = tool_response.cost
+                    result['plugin_token'] = tool_response.token_usage
+                result['evidence'] = get_plugin_response_content(tool_response)
+            except:
+                result['evidence'] = "No evidence found."
+            finally:
+                output.panel_print(result['evidence'], f"[green] Function Response of [blue]{tool}: ")
+        return result
+
 
     def _get_worker_evidence(self, planner_evidences, evidences_level, output=BaseOutput()):
         worker_evidences = dict()
         plugin_cost, plugin_token = 0.0, 0.0
-        for level in evidences_level:
-            # TODO: Run simultaneously
-            for e in level:
-                tool_call = planner_evidences[e]
-                if "[" not in tool_call:
-                    worker_evidences[e] = tool_call
-                    continue
-                tool, tool_input = tool_call.split("[", 1)
-                tool_input = tool_input[:-1]
-                # find variables in input and replace with previous evidences
-                for var in re.findall(r"#E\d+", tool_input):
-                    if var in worker_evidences:
-                        tool_input = tool_input.replace(var, "[" + worker_evidences.get(var, "") + "]")
-                try:
-                    tool_response = self._find_plugin(tool).run(tool_input)
-                    # cumulate agent-as-plugin costs and tokens.
-                    if isinstance(tool_response, AgentOutput):
-                        plugin_cost += tool_response.cost
-                        plugin_token += tool_response.token_usage
-                    worker_evidences[e] = get_plugin_response_content(tool_response)
-                except:
-                    worker_evidences[e] = "No evidence found."
-                finally:
-                    output.panel_print(worker_evidences[e], f"[green] Function Response of [blue]{tool}: ")
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            for level in evidences_level:
+                results = []
+                for e in level:
+                    results.append(pool.submit(self._run_plugin, e, planner_evidences, worker_evidences, output))
+                if len(results) > 1:
+                    output.update_status(f"Running tasks {level} in parallel.")
+                else:
+                    output.update_status(f"Running task {level[0]}.")
+                for r in results:
+                    resp = r.result()
+                    plugin_cost += resp['plugin_cost']
+                    plugin_token += resp['plugin_token']
+                    worker_evidences[resp['e']] = resp['evidence']
+                output.done()
+
         return worker_evidences, plugin_cost, plugin_token
 
     def _find_plugin(self, name: str):

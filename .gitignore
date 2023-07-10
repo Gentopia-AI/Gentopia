@@ -1,6 +1,6 @@
 #Custom
 .idea/
-test.ipynb
+examples/test.ipynb
 test.py
 .chroma
 
