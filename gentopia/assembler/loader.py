@@ -38,7 +38,12 @@ class Loader(yaml.SafeLoader):
 
     def tool(self, node: yaml.Node) -> Any:
         tool = self.construct_scalar(node)
-        tool_cls = eval(tool)
+        if '.' in tool:
+            _path = tool.split('.')
+            module = importlib.import_module('.'.join(_path[:-1]))
+            tool_cls = getattr(module, _path[-1])
+        else:
+            tool_cls = eval(tool)
         assert issubclass(tool_cls, BaseTool)
         return tool_cls
 

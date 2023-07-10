@@ -74,11 +74,11 @@ if __name__ == '__main__':
     # exit(0)give me some sentences in markdown format
     enable_log(log_level='debug')
 
-    assembler = AgentAssembler(file='configs/react.yaml')
+    assembler = AgentAssembler(file='configs/mathria.yaml')
 
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
-    # ask(agent)
+    ask(agent)
     #
     # print(agent)
     # x = " What is Trump's current age raised to the 0.43 power?"
