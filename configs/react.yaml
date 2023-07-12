@@ -32,8 +32,5 @@ plugins:
 #      - answer things about math
 
 
-## Authentication
-auth:
-  OPENAI_API_KEY: !file /home/api.key
-  WOLFRAM_ALPHA_APPID: !file /home/wolfram.key
+
 
