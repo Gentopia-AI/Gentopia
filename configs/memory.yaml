@@ -7,7 +7,7 @@ prompt_template: !prompt ZeroShotVanillaPrompt
 memory:
   memory_type: chroma   # chroma or pinecone
   conversation_threshold: 1        # first-level memory
-  reasoning_threshold: 1        # second-level memory
+  reasoning_threshold: 1          # second-level memory
   params:
     index: main
     top_k: 2
@@ -24,6 +24,6 @@ target_tasks:
 plugins:
   - name: google_search
   - name: web_page
-#  - !include mathria.yaml
+  # - !include mathria.yaml
 
 
