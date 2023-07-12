@@ -1,13 +1,13 @@
 # Agent Config
-name: main(memory)
+name: main
 type: openai_memory
 version: 0.0.1
 description: main agent leveraging OpenAI function call API.
 prompt_template: !prompt ZeroShotVanillaPrompt
 memory:
   memory_type: chroma   # chroma or pinecone
-  threshold_1: 1        # first-level memory
-  threshold_2: 1        # second-level memory
+  conversation_threshold: 1        # first-level memory
+  reasoning_threshold: 1        # second-level memory
   params:
     index: main
     top_k: 2

@@ -61,15 +61,15 @@ End of the related history.
 @pydantic.dataclasses.dataclass(config=Config)
 class MemoryWrapper:
     memory: BaseMemory
-    threshold_I: int
-    threshold_II: int
+    conversation_threshold: int
+    reasoning_threshold: int
     
-    def __init__(self, memory: VectorStoreRetrieverMemory, threshold1: int, threshold2: int):
+    def __init__(self, memory: VectorStoreRetrieverMemory, conversation_threshold: int, reasoning_threshold: int):
         self.memory = memory
-        self.threshold_I = threshold1
-        self.threshold_II = threshold2
-        assert self.threshold_I >= 0
-        assert self.threshold_II >= 0
+        self.conversation_threshold = conversation_threshold
+        self.reasoning_threshold = reasoning_threshold
+        assert self.conversation_threshold >= 0
+        assert self.reasoning_threshold >= 0
         self.history_queue_I = queue.Queue()
         self.history_queue_II = queue.Queue()
         self.summary_I =  ""     # memory I  - level
@@ -83,7 +83,7 @@ class MemoryWrapper:
     def save_memory_I(self, input, output, llm: BaseLLM):
         self.rank_I += 1
         self.history_queue_I.put((input, output, self.rank_I))
-        while self.history_queue_I.qsize() > self.threshold_I:
+        while self.history_queue_I.qsize() > self.conversation_threshold:
             top_context = self.history_queue_I.get()
             self.__save_to_memory(top_context)
             # self.summary_I += llm.completion(prompt=SummaryPrompt.format(rank=top_context[2], input=top_context[0], output=top_context[1])).content + "\n"
@@ -91,7 +91,7 @@ class MemoryWrapper:
     def save_memory_II(self, input, output, llm: BaseLLM):
         self.rank_II += 1
         self.history_queue_II.put((input, output, self.rank_II))
-        while self.history_queue_II.qsize() > self.threshold_II:
+        while self.history_queue_II.qsize() > self.reasoning_threshold:
             top_context = self.history_queue_II.get()
             self.__save_to_memory(top_context)
             self.summary_II += llm.completion(prompt=SummaryPrompt.format(rank=top_context[2], input=top_context[0], output=top_context[1])).content + "\n"
@@ -126,7 +126,7 @@ class MemoryWrapper:
 
 
 
-def create_memory(memory_type, threshold1, threshold2, **kwargs) -> MemoryWrapper:
+def create_memory(memory_type, conversation_threshold, reasoning_threshold, **kwargs) -> MemoryWrapper:
     # choose desirable memory you need!
     memory: BaseMemory = None
     if memory_type == "pinecone":
@@ -144,4 +144,4 @@ def create_memory(memory_type, threshold1, threshold2, **kwargs) -> MemoryWrappe
         memory = VectorStoreRetrieverMemory(retriever=retriever)
     else:
         raise ValueError(f"Memory {memory_type} is not supported currently.")   
-    return MemoryWrapper(memory, threshold1, threshold2)
+    return MemoryWrapper(memory, conversation_threshold, reasoning_threshold)
