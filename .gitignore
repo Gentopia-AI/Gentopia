@@ -2,6 +2,7 @@
 .idea/
 examples/test.ipynb
 test.py
+notebooks/test.ipynb
 .chroma
 node_modules/
 
