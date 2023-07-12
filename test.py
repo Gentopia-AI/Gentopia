@@ -13,6 +13,7 @@ from transformers import GenerationConfig
 
 from gentopia.model.param_model import HuggingfaceParamModel
 from gentopia.output import enable_log
+from gentopia import chat
 from gentopia.output.console_output import ConsoleOutput
 
 import logging
@@ -48,24 +49,23 @@ def print_tree(obj, indent=0):
                         print_tree(item, indent + 1)
 
 
-def ask(agent):
-    out = ConsoleOutput()
-
-    def handler(signum, frame):
-        out.print("\n[red]Bye!")
-        exit(0)
-
-    signal.signal(signal.SIGINT, handler)
-    while True:
-        out.print("[green]User: ", end="")
-        text = input()
-        if text:
-            response = agent.stream(text, output=out)
-        else:
-            response = agent.stream(output=out)
-
-        out.done(_all=True)
-        print("\n")
+# def ask(agent, output = ConsoleOutput()):
+#
+#     def handler(signum, frame):
+#         output.print("\n[red]Bye!")
+#         exit(0)
+#
+#     signal.signal(signal.SIGINT, handler)
+#     while True:
+#         output.print("[green]User: ", end="")
+#         text = input()
+#         if text:
+#             response = agent.stream(text, output=output)
+#         else:
+#             response = agent.stream(output=output)
+#
+#         output.done(_all=True)
+        # print("\n")
 
 
 if __name__ == '__main__':
@@ -73,6 +73,7 @@ if __name__ == '__main__':
     # config = Config.load('main.yaml') # then tell me what is GIL in python
     # print(config)calculate sqrt(10),then tell me what is GIL in python, and then calculate sqrt(100)
     # exit(0)give me some sentences in markdown format
+
     enable_log(log_level='debug')
     dotenv.load_dotenv(".env")
 
@@ -80,7 +81,7 @@ if __name__ == '__main__':
 
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
-    ask(agent)
+    chat(agent)
     #
     # print(agent)
     # x = " What is Trump's current age raised to the 0.43 power?"

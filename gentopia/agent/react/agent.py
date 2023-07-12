@@ -145,6 +145,7 @@ class ReactAgent(BaseAgent):
         return AgentOutput(output=response.content, cost=total_cost, token_usage=total_token)
 
     def stream(self, instruction: Optional[str] = None, output: Optional[BaseOutput] = None):
+        self.intermediate_steps.clear()
         total_cost = 0.0
         total_token = 0
         if output is None:
