@@ -20,7 +20,25 @@ from gentopia.tools.basetool import ToolMetaclass
 
 
 class AgentAssembler:
+    """
+        This class is responsible for assembling an agent instance from a configuration file or dictionary and its dependencies.
+
+        :param file: A path to a configuration file.
+        :type file: str, optional
+        :param config: A configuration dictionary.
+        :type config: dict, optional
+    """
     def __init__(self, file=None, config=None):
+        """
+            Constructor method.
+
+            Initializes an instance of the AgentAssembler class.
+
+            :param file: A path to a configuration file.
+            :type file: str, optional
+            :param config: A configuration dictionary.
+            :type config: dict, optional
+        """
         if file is not None:
             self.config = Config.from_file(file)
         elif config is not None:
@@ -30,6 +48,15 @@ class AgentAssembler:
         self.manager: Optional[BaseLLMManager] = None
 
     def get_agent(self, config=None):
+        """
+            This method returns an agent instance based on the provided configuration.
+
+            :param config: A configuration dictionary.
+            :type config: dict, optional
+            :raises AssertionError: If the configuration is None.
+            :return: An agent instance.
+            :rtype: BaseAgent
+        """
         if config is None:
             config = self.config
         assert config is not None
@@ -58,13 +85,32 @@ class AgentAssembler:
         return agent
 
     def _parse_memory(self, obj) -> MemoryWrapper:
+        """
+            This method parses the memory configuration and returns a memory wrapper instance.
+
+            :param obj: A configuration dictionary containing memory parameters.
+            :type obj: dict
+            :return: A memory wrapper instance.
+            :rtype: MemoryWrapper
+        """
         if obj == []:
             return None
         memory_type = obj["memory_type"] # memory_type: ["pinecone"]
-        return create_memory(memory_type, obj['threshold_1'], obj['threshold_2'], **obj["params"]) # params of memory. Different memories may have different params
+        return create_memory(memory_type, obj['threshold_1'], obj['threshold_2'], **obj["params"]) # params of memory.
+        # Different memories may have different params
 
 
     def _get_llm(self, obj) -> Union[BaseLLM, Dict[str, BaseLLM]]:
+        """
+            This method returns a language model manager (LLM) instance based on the provided configuration.
+
+            :param obj: A configuration dictionary or string.
+            :type obj: dict or str
+            :raises AssertionError: If the configuration is not a dictionary or string.
+            :raises ValueError: If the specified LLM is not supported.
+            :return: An LLM instance or dictionary of LLM instances.
+            :rtype: Union[BaseLLM, Dict[str, BaseLLM]]
+        """
         assert isinstance(obj, dict) or isinstance(obj, str)
         if isinstance(obj, dict) and ("model_name" not in obj):
             return {
@@ -75,6 +121,15 @@ class AgentAssembler:
             return self._parse_llm(obj)
 
     def _parse_llm(self, obj) -> BaseLLM:
+        """
+            This method parses the Language Model Manager (LLM) configuration and returns an LLM instance.
+
+            :param obj: A configuration dictionary or string.
+            :type obj: dict or str
+            :raises ValueError: If the specified LLM is not supported.
+            :return: An LLM instance.
+            :rtype: BaseLLM
+        """
         if isinstance(obj, str):
             name = obj
             model_param = dict()
@@ -97,6 +152,15 @@ class AgentAssembler:
         return self.manager.get_llm(name, params, cls=HuggingfaceLLMClient, device=device)
 
     def _get_prompt_template(self, obj):
+        """
+            This method returns a prompt template instance based on the provided configuration.
+
+            :param obj: A configuration dictionary or prompt template instance.
+            :type obj: dict or PromptTemplate
+            :raises AssertionError: If the configuration is not a dictionary or prompt template instance.
+            :return: A prompt template instance.
+            :rtype: PromptTemplate
+        """
         assert isinstance(obj, dict) or isinstance(obj, PromptTemplate)
         if isinstance(obj, dict):
             return {
@@ -107,6 +171,15 @@ class AgentAssembler:
             return ans
 
     def _parse_prompt_template(self, obj):
+        """
+            This method parses the prompt template configuration and returns a prompt template instance.
+
+            :param obj: A configuration dictionary or prompt template instance.
+            :type obj: dict or PromptTemplate
+            :raises AssertionError: If the configuration is not a dictionary or prompt template instance.
+            :return: A prompt template instance.
+            :rtype: PromptTemplate
+        """
         assert isinstance(obj, dict) or isinstance(obj, PromptTemplate)
         if isinstance(obj, PromptTemplate):
             return obj
@@ -118,6 +191,15 @@ class AgentAssembler:
                               validate_template=validate_template)
 
     def _parse_plugins(self, obj):
+        """
+            This method parses the plugin configuration and returns a list of plugin instances.
+
+            :param obj: A list of plugin configuration dictionaries.
+            :type obj: list
+            :raises AssertionError: If the configuration is not a list.
+            :return: A list of plugin instances.
+            :rtype: list
+        """
         assert isinstance(obj, list)
         result = []
         for plugin in obj:
@@ -147,5 +229,11 @@ class AgentAssembler:
         return result
 
     def _set_auth_env(self, obj):
+        """
+            This method sets environment variables for authentication.
+
+            :param obj: A dictionary containing authentication information.
+            :type obj: dict
+        """
         for key in obj:
             os.environ[key] = obj.get(key)

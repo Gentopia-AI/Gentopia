@@ -1,13 +1,14 @@
+import os
 from typing import AnyStr
 
-from langchain import WolframAlphaAPIWrapper
-
+import wolframalpha
 from .basetool import *
 
 
-class CustomWolframAlphaAPITool(WolframAlphaAPIWrapper):
+class CustomWolframAlphaAPITool:
     def __init__(self):
-        super().__init__()
+        self.app_id = os.getenv("WOLFRAM_ALPHA_APPID")
+        self.wolfram_client = wolframalpha.Client(self.app_id)
 
     def run(self, query: str) -> str:
         """Run query through WolframAlpha and parse result."""
