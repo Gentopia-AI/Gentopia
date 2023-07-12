@@ -2,21 +2,22 @@ import os
 from typing import Union, Dict, Optional
 
 import torch.cuda
-from langchain import PromptTemplate
 
+from gentopia.prompt import PromptTemplate
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.assembler.config import Config
 from gentopia.llm import HuggingfaceLLMClient, OpenAIGPTClient
 from gentopia.llm.base_llm import BaseLLM
 from gentopia.llm.llm_info import TYPES
 from gentopia.manager.base_llm_manager import BaseLLMManager
+from gentopia.memory.api import MemoryWrapper
+from gentopia.memory.api import create_memory
 from gentopia.model.agent_model import AgentType
 from gentopia.model.param_model import OpenAIParamModel, HuggingfaceParamModel
 from gentopia.tools import *
 from gentopia.tools import BaseTool
 from gentopia.tools.basetool import ToolMetaclass
-from gentopia.memory.api import MemoryWrapper
-from gentopia.memory.api import create_memory
+
 
 class AgentAssembler:
     def __init__(self, file=None, config=None):

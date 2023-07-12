@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from gradio_client.client import Job
 
-from gradio_tools.tools.gradio_tool import GradioTool
+from gentopia.tools.gradio_tools.tools.gradio_tool import GradioTool
 
 
 class StableDiffusionPromptGeneratorTool(GradioTool):

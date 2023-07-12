@@ -1,12 +1,11 @@
+import os
+from enum import Enum
 from typing import AnyStr
 
 import requests
 from bs4 import BeautifulSoup
-# from ..tool import Tool
-from enum import Enum
-from typing import Tuple
+
 from .basetool import *
-import os
 
 
 class BingAPI:

@@ -1,7 +1,9 @@
-from typing import AnyStr, List
-from .basetool import *
+from typing import AnyStr
+
 import requests
 from bs4 import BeautifulSoup
+
+from .basetool import *
 
 
 class WebPage(BaseTool):
@@ -9,7 +11,7 @@ class WebPage(BaseTool):
 
     name = "WebPage"
     description = "Worker that can get web pages through url. Useful when you have a  url and need to find detailed information." \
-                    "You must make sure that the url is real and correct, come from plugin or user input."\
+                  "You must make sure that the url is real and correct, come from plugin or user input." \
                   "Input should be a url."
 
     args_schema: Optional[Type[BaseModel]] = create_model("WebPageArgs", url=(str, ...))

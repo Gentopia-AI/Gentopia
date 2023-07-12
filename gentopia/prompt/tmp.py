@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from gentopia.prompt import PromptTemplate
 
 SummaryVanillaPrompt = PromptTemplate(
     input_variables=["instruction"],

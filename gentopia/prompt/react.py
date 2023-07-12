@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from gentopia.prompt import PromptTemplate
 
 ZeroShotReactPrompt = PromptTemplate(
     input_variables=["instruction", "agent_scratchpad", "tool_names", "tool_description"],
