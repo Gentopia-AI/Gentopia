@@ -74,7 +74,7 @@ if __name__ == '__main__':
     # exit(0)give me some sentences in markdown format
     enable_log(log_level='info')
 
-    assembler = AgentAssembler(file='configs/react.yaml')
+    assembler = AgentAssembler(file='configs/mathria.yaml')
 
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()
