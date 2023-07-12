@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Tuple
 
 from gradio_client.client import Job
 
-from gradio_tools.tools.gradio_tool import GradioTool
+from gentopia.tools.gradio_tools.tools.gradio_tool import GradioTool
 
 if TYPE_CHECKING:
     import gradio as gr

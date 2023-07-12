@@ -37,25 +37,11 @@ def _results_to_docs_and_scores(results: Any) -> List[Tuple[Document, float]]:
 
 
 class Chroma(VectorStore):
-    """Wrapper around ChromaDB embeddings platform.
-
-    To use, you should have the ``chromadb`` python package installed.
-
-    Example:
-        .. code-block:: python
-
-                from langchain.vectorstores import Chroma
-                from langchain.embeddings.openai import OpenAIEmbeddings
-
-                embeddings = OpenAIEmbeddings()
-                vectorstore = Chroma("langchain_store", embeddings.embed_query)
-    """
-
-    _LANGCHAIN_DEFAULT_COLLECTION_NAME = "langchain"
+    """Wrapper around ChromaDB embeddings platform."""
 
     def __init__(
         self,
-        collection_name: str = _LANGCHAIN_DEFAULT_COLLECTION_NAME,
+        collection_name: str = "gentopia",
         embedding_function: Optional[Embeddings] = None,
         persist_directory: Optional[str] = None,
         client_settings: Optional[chromadb.config.Settings] = None,
@@ -282,7 +268,7 @@ class Chroma(VectorStore):
         embedding: Optional[Embeddings] = None,
         metadatas: Optional[List[dict]] = None,
         ids: Optional[List[str]] = None,
-        collection_name: str = _LANGCHAIN_DEFAULT_COLLECTION_NAME,
+        collection_name: str = "gentopia",
         persist_directory: Optional[str] = None,
         client_settings: Optional[chromadb.config.Settings] = None,
         client: Optional[chromadb.Client] = None,
@@ -321,7 +307,7 @@ class Chroma(VectorStore):
         documents: List[Document],
         embedding: Optional[Embeddings] = None,
         ids: Optional[List[str]] = None,
-        collection_name: str = _LANGCHAIN_DEFAULT_COLLECTION_NAME,
+        collection_name: str = "gentopia",
         persist_directory: Optional[str] = None,
         client_settings: Optional[chromadb.config.Settings] = None,
         client: Optional[chromadb.Client] = None,  # Add this line

@@ -2,15 +2,14 @@ import logging
 import re
 from typing import List, Union, Optional, Type, Tuple
 
-from langchain import PromptTemplate
-from langchain.schema import AgentFinish
+from gentopia import PromptTemplate
 
 from gentopia.output.base_output import BaseOutput
 from gentopia.tools.basetool import BaseTool
 from pydantic import create_model, BaseModel
 
 from gentopia.agent.base_agent import BaseAgent
-from gentopia.assembler.task import AgentAction
+from gentopia.assembler.task import AgentAction, AgentFinish
 from gentopia.llm.client.openai import OpenAIGPTClient
 from gentopia.model.agent_model import AgentType, AgentOutput
 from gentopia.utils.cost_helpers import calculate_cost
@@ -53,6 +52,7 @@ class ReactAgent(BaseAgent):
     ) -> str:
         """Construct the scratchpad that lets the agent continue its thought process."""
         thoughts = ""
+        print(intermediate_steps)
         for action, observation in intermediate_steps:
             thoughts += action.log
             thoughts += f"\nObservation: {observation}\nThought:"
@@ -76,7 +76,6 @@ class ReactAgent(BaseAgent):
             # ensure if its a well formed SQL query we don't remove any trailing " chars
             if tool_input.startswith("SELECT ") is False:
                 tool_input = tool_input.strip('"')
-
 
             return AgentAction(action, tool_input, text)
 
@@ -133,7 +132,7 @@ class ReactAgent(BaseAgent):
             total_cost += calculate_cost(self.llm.model_name, response.prompt_token,
                                          response.completion_token)
             total_token += response.prompt_token + response.completion_token
-            self.intermediate_steps.append([self._parse_output(response.content),])
+            self.intermediate_steps.append([self._parse_output(response.content), ])
             if isinstance(self.intermediate_steps[-1][0], AgentFinish):
                 break
             action = self.intermediate_steps[-1][0].tool

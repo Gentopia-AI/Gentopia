@@ -1,17 +1,14 @@
-import requests
-import json
-# from ..tool import Tool
-import os
-
 import platform
 import re
 import subprocess
-from typing import TYPE_CHECKING, List, Union
+from typing import AnyStr
+from typing import List
 from uuid import uuid4
 
 import pexpect
-from typing import AnyStr
+
 from .basetool import *
+
 
 # Revised from the Contributor: [Sihan Zhao](https://github.com/Sarah816)
 
@@ -30,14 +27,15 @@ def _lazy_import_pexpect() -> pexpect:
         )
     return pexpect
 
+
 class BashProcess:
     """Executes bash commands and returns the output."""
 
     def __init__(
-        self,
-        strip_newlines: bool = False,
-        return_err_output: bool = False,
-        persistent: bool = False,
+            self,
+            strip_newlines: bool = False,
+            return_err_output: bool = False,
+            persistent: bool = False,
     ):
         """Initialize with stripping newlines."""
         self.strip_newlines = strip_newlines
@@ -131,6 +129,7 @@ def get_platform() -> str:
         return "MacOS"
     return system
 
+
 def get_default_bash_process() -> BashProcess:
     """Get file path from string."""
     return BashProcess(return_err_output=True)
@@ -138,7 +137,7 @@ def get_default_bash_process() -> BashProcess:
 
 class RunShell(BaseTool):
     name = "BashShell"
-    description= "Run shell commands on this {get_platform()} machine"
+    description = "Run shell commands on this {get_platform()} machine"
     args_schema: Optional[Type[BaseModel]] = create_model("RunShellArgs", commands=(str, ...))
     process: BashProcess = get_default_bash_process()
 

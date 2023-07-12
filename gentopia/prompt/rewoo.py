@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from gentopia.prompt import PromptTemplate
 
 ZeroShotPlannerPrompt = PromptTemplate(
     input_variables=["tool_description", "task"],

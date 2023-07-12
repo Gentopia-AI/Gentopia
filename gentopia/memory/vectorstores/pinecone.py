@@ -19,24 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class Pinecone(VectorStore):
-    """Wrapper around Pinecone vector database.
-
-    To use, you should have the ``pinecone-client`` python package installed.
-
-    Example:
-        .. code-block:: python
-
-            from langchain.vectorstores import Pinecone
-            from langchain.embeddings.openai import OpenAIEmbeddings
-            import pinecone
-
-            # The environment should be the one specified next to the API key
-            # in your Pinecone console
-            pinecone.init(api_key="***", environment="...")
-            index = pinecone.Index("langchain-demo")
-            embeddings = OpenAIEmbeddings()
-            vectorstore = Pinecone(index, embeddings.embed_query, "text")
-    """
+    """Wrapper around Pinecone vector database."""
 
     def __init__(
         self,
@@ -266,31 +249,7 @@ class Pinecone(VectorStore):
         namespace: Optional[str] = None,
         **kwargs: Any,
     ) -> Pinecone:
-        """Construct Pinecone wrapper from raw documents.
-
-        This is a user friendly interface that:
-            1. Embeds documents.
-            2. Adds the documents to a provided Pinecone index
-
-        This is intended to be a quick way to get started.
-
-        Example:
-            .. code-block:: python
-
-                from langchain import Pinecone
-                from langchain.embeddings import OpenAIEmbeddings
-                import pinecone
-
-                # The environment should be the one specified next to the API key
-                # in your Pinecone console
-                pinecone.init(api_key="***", environment="...")
-                embeddings = OpenAIEmbeddings()
-                pinecone = Pinecone.from_texts(
-                    texts,
-                    embeddings,
-                    index_name="langchain-demo"
-                )
-        """
+        """Construct Pinecone wrapper from raw documents."""
         try:
             import pinecone
         except ImportError:

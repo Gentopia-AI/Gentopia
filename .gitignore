@@ -2,7 +2,9 @@
 .idea/
 examples/test.ipynb
 test.py
+notebooks/test.ipynb
 .chroma
+node_modules/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -2,7 +2,7 @@ import io
 from abc import ABC, abstractmethod
 from typing import List, Dict, Union, Any, Optional, Type, Callable
 
-from langchain import PromptTemplate
+from gentopia import PromptTemplate
 from pydantic import BaseModel, create_model
 
 from gentopia.llm.base_llm import BaseLLM

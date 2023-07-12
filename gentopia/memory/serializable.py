@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Literal, TypedDict, Union, cast
 
 
 class BaseSerialized(TypedDict):
-    lc: int
+    gt: int
     id: List[str]
 
 
@@ -23,22 +23,21 @@ class SerializedNotImplemented(BaseSerialized):
 
 class Serializable(BaseModel, ABC):
     @property
-    def lc_serializable(self) -> bool:
+    def gt_serializable(self) -> bool:
         """
         Return whether or not the class is serializable.
         """
         return False
 
     @property
-    def lc_namespace(self) -> List[str]:
+    def gt_namespace(self) -> List[str]:
         """
-        Return the namespace of the langchain object.
-        eg. ["langchain", "llms", "openai"]
+        Return the namespace of the gentopia object.
         """
         return self.__class__.__module__.split(".")
 
     @property
-    def lc_secrets(self) -> Dict[str, str]:
+    def gt_secrets(self) -> Dict[str, str]:
         """
         Return a map of constructor argument names to secret ids.
         eg. {"openai_api_key": "OPENAI_API_KEY"}
@@ -46,7 +45,7 @@ class Serializable(BaseModel, ABC):
         return dict()
 
     @property
-    def lc_attributes(self) -> Dict:
+    def gt_attributes(self) -> Dict:
         """
         Return a list of attribute names that should be included in the
         serialized kwargs. These attributes must be accepted by the
@@ -57,25 +56,25 @@ class Serializable(BaseModel, ABC):
     class Config:
         extra = "ignore"
 
-    _lc_kwargs = PrivateAttr(default_factory=dict)
+    _gt_kwargs = PrivateAttr(default_factory=dict)
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self._lc_kwargs = kwargs
+        self._gt_kwargs = kwargs
 
     def to_json(self) -> Union[SerializedConstructor, SerializedNotImplemented]:
-        if not self.lc_serializable:
+        if not self.gt_serializable:
             return self.to_json_not_implemented()
 
         secrets = dict()
         # Get latest values for kwargs if there is an attribute with same name
-        lc_kwargs = {
+        gt_kwargs = {
             k: getattr(self, k, v)
-            for k, v in self._lc_kwargs.items()
+            for k, v in self._gt_kwargs.items()
             if not (self.__exclude_fields__ or {}).get(k, False)  # type: ignore
         }
 
-        # Merge the lc_secrets and lc_attributes from every class in the MRO
+        # Merge the gt_secrets and gt_attributes from every class in the MRO
         for cls in [None, *self.__class__.mro()]:
             # Once we get to Serializable, we're done
             if cls is Serializable:
@@ -85,23 +84,23 @@ class Serializable(BaseModel, ABC):
             this = cast(
                 Serializable, self if cls is None else super(cls, self))
 
-            secrets.update(this.lc_secrets)
-            lc_kwargs.update(this.lc_attributes)
+            secrets.update(this.gt_secrets)
+            gt_kwargs.update(this.gt_attributes)
 
         # include all secrets, even if not specified in kwargs
         # as these secrets may be passed as an environment variable instead
         for key in secrets.keys():
-            secret_value = getattr(self, key, None) or lc_kwargs.get(key)
+            secret_value = getattr(self, key, None) or gt_kwargs.get(key)
             if secret_value is not None:
-                lc_kwargs.update({key: secret_value})
+                gt_kwargs.update({key: secret_value})
 
         return {
-            "lc": 1,
+            "gt": 1,
             "type": "constructor",
-            "id": [*self.lc_namespace, self.__class__.__name__],
-            "kwargs": lc_kwargs
+            "id": [*self.gt_namespace, self.__class__.__name__],
+            "kwargs": gt_kwargs
             if not secrets
-            else _replace_secrets(lc_kwargs, secrets),
+            else _replace_secrets(gt_kwargs, secrets),
         }
 
     def to_json_not_implemented(self) -> SerializedNotImplemented:
@@ -122,7 +121,7 @@ def _replace_secrets(
             current = current[part]
         if last in current:
             current[last] = {
-                "lc": 1,
+                "gt": 1,
                 "type": "secret",
                 "id": [secret_id],
             }
@@ -140,7 +139,7 @@ def to_json_not_implemented(obj: object) -> SerializedNotImplemented:
     except Exception:
         pass
     return {
-        "lc": 1,
+        "gt": 1,
         "type": "not_implemented",
         "id": _id,
     }

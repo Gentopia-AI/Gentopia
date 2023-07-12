@@ -1,6 +1,7 @@
 import signal
 import time
 
+import dotenv
 import rich
 from rich.box import Box
 
@@ -72,9 +73,11 @@ if __name__ == '__main__':
     # config = Config.load('main.yaml') # then tell me what is GIL in python
     # print(config)calculate sqrt(10),then tell me what is GIL in python, and then calculate sqrt(100)
     # exit(0)give me some sentences in markdown format
-    enable_log(log_level='info')
 
-    assembler = AgentAssembler(file='configs/mathria.yaml')
+    enable_log(log_level='debug')
+    dotenv.load_dotenv(".env")
+
+    assembler = AgentAssembler(file='configs/memory.yaml')
 
     # # assembler.manager = LocalLLMManager()
     agent = assembler.get_agent()

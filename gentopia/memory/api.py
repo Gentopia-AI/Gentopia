@@ -4,7 +4,7 @@ from gentopia.memory.vectorstores.pinecone import Pinecone
 from gentopia.memory.vectorstores.chroma import Chroma
 from gentopia.memory.embeddings import OpenAIEmbeddings
 from gentopia.llm.base_llm import BaseLLM
-from langchain import PromptTemplate
+from gentopia import PromptTemplate
 import pydantic
 import os
 import queue

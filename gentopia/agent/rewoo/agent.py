@@ -1,9 +1,9 @@
 import logging
 import os
 import re
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Tuple
 
-from langchain import PromptTemplate
+from gentopia import PromptTemplate
 from concurrent.futures import ThreadPoolExecutor
 from gentopia.agent.base_agent import BaseAgent
 from gentopia.agent.rewoo.nodes.Planner import Planner
@@ -67,7 +67,7 @@ class RewooAgent(BaseAgent):
 
         return plan_to_es, plans
 
-    def _parse_planner_evidences(self, planner_response: str) -> (dict[str, str], List[List[str]]):
+    def _parse_planner_evidences(self, planner_response: str) -> Tuple[dict[str, str], List[List[str]]]:
         """
         Parse planner output. This should return a mapping from #E to tool call.
         It should also identify the level of each #E in dependency map.

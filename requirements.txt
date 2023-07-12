@@ -12,4 +12,5 @@ setuptools==67.8.0
 torch==2.0.1
 transformers==4.31.0.dev0
 uvicorn==0.22.0
-pinecone-client==2.2.1
+pinecone-client
+chromadb=0.3.26

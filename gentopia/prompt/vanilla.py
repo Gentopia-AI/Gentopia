@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from gentopia.prompt import PromptTemplate
 
 ZeroShotVanillaPrompt = PromptTemplate(
     input_variables=["instruction"],

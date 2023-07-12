@@ -1,5 +1,5 @@
 import signal
-
+from .prompt import PromptTemplate
 from .assembler.agent_assembler import AgentAssembler
 from .output import enable_log
 from .output.base_output import *
@@ -28,3 +28,4 @@ def chat(agent, output = ConsoleOutput(), verbose = False, log_level = None, log
             response = agent.stream(output=output)
 
         output.done(_all=True)
+

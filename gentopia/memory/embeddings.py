@@ -126,45 +126,7 @@ async def async_embed_with_retry(embeddings: OpenAIEmbeddings, **kwargs: Any) ->
 
 
 class OpenAIEmbeddings(BaseModel, Embeddings):
-    """Wrapper around OpenAI embedding models.
-
-    To use, you should have the ``openai`` python package installed, and the
-    environment variable ``OPENAI_API_KEY`` set with your API key or pass it
-    as a named parameter to the constructor.
-
-    Example:
-        .. code-block:: python
-
-            from langchain.embeddings import OpenAIEmbeddings
-            openai = OpenAIEmbeddings(openai_api_key="my-api-key")
-
-    In order to use the library with Microsoft Azure endpoints, you need to set
-    the OPENAI_API_TYPE, OPENAI_API_BASE, OPENAI_API_KEY and OPENAI_API_VERSION.
-    The OPENAI_API_TYPE must be set to 'azure' and the others correspond to
-    the properties of your endpoint.
-    In addition, the deployment name must be passed as the model parameter.
-
-    Example:
-        .. code-block:: python
-
-            import os
-            os.environ["OPENAI_API_TYPE"] = "azure"
-            os.environ["OPENAI_API_BASE"] = "https://<your-endpoint.openai.azure.com/"
-            os.environ["OPENAI_API_KEY"] = "your AzureOpenAI key"
-            os.environ["OPENAI_API_VERSION"] = "2023-03-15-preview"
-            os.environ["OPENAI_PROXY"] = "http://your-corporate-proxy:8080"
-
-            from langchain.embeddings.openai import OpenAIEmbeddings
-            embeddings = OpenAIEmbeddings(
-                deployment="your-embeddings-deployment-name",
-                model="your-embeddings-model-name",
-                openai_api_base="https://your-endpoint.openai.azure.com/",
-                openai_api_type="azure",
-            )
-            text = "This is a test query."
-            query_result = embeddings.embed_query(text)
-
-    """
+    """Wrapper around OpenAI embedding models."""
 
     client: Any  #: :meta private:
     model: str = "text-embedding-ada-002"

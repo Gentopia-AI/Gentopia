@@ -14,8 +14,8 @@ llm:
 target_tasks:
   - anything
 plugins:
-  - name: google_search
+#  - name: google_search
   - name: web_page
-  - !include mathria.yaml
+#  - !include mathria.yaml
 
 

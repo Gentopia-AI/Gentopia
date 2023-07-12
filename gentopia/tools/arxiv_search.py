@@ -1,6 +1,6 @@
 from typing import AnyStr, Any
 import arxiv
-from .basetool import *
+from gentopia.tools.basetool import *
 
 
 class ArxivSearch(BaseTool):
