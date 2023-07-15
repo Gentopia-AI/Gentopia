@@ -59,10 +59,26 @@ class Serializable(BaseModel, ABC):
     _gt_kwargs = PrivateAttr(default_factory=dict)
 
     def __init__(self, **kwargs: Any) -> None:
+        """
+        Initialize the Serializable object.
+
+        Args:
+            **kwargs (Any): Keyword arguments to initialize the object.
+        """
         super().__init__(**kwargs)
         self._gt_kwargs = kwargs
 
     def to_json(self) -> Union[SerializedConstructor, SerializedNotImplemented]:
+        """
+        Convert the object to JSON representation.
+
+        Returns:
+            Union[SerializedConstructor, SerializedNotImplemented]: The JSON representation.
+
+        Notes:
+            - If the object is not serializable, returns SerializedNotImplemented.
+            - If the object is serializable, returns SerializedConstructor.
+        """
         if not self.gt_serializable:
             return self.to_json_not_implemented()
 
@@ -104,12 +120,28 @@ class Serializable(BaseModel, ABC):
         }
 
     def to_json_not_implemented(self) -> SerializedNotImplemented:
+        """
+        Convert the object to a not implemented JSON representation.
+
+        Returns:
+            SerializedNotImplemented: The not implemented JSON representation.
+        """
         return to_json_not_implemented(self)
 
 
 def _replace_secrets(
     root: Dict[Any, Any], secrets_map: Dict[str, str]
 ) -> Dict[Any, Any]:
+    """
+    Replace secrets in the JSON representation.
+
+    Args:
+        root (Dict[Any, Any]): The root dictionary.
+        secrets_map (Dict[str, str]): The map of secrets.
+
+    Returns:
+        Dict[Any, Any]: The dictionary with replaced secrets.
+    """
     result = root.copy()
     for path, secret_id in secrets_map.items():
         [*parts, last] = path.split(".")
@@ -129,6 +161,15 @@ def _replace_secrets(
 
 
 def to_json_not_implemented(obj: object) -> SerializedNotImplemented:
+    """
+    Convert an object to a not implemented JSON representation.
+
+    Args:
+        obj (object): The object to convert.
+
+    Returns:
+        SerializedNotImplemented: The not implemented JSON representation.
+    """
     _id: List[str] = []
     try:
         if hasattr(obj, "__name__"):
