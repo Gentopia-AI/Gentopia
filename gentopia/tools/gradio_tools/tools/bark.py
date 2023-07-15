@@ -62,6 +62,14 @@ class BarkTextToSpeechTool(GradioTool):
         super().__init__(name, description, src, hf_token, duplicate)
 
     def create_job(self, query: str) -> Job:
+        """
+        Create a job for the input query.
+
+        :param query: The input query, formatted as two strings separated by '|'. The first is the text to read, the second is the desired speaking language.
+        :type query: str
+        :return: A job for the given query.
+        :rtype: Job
+        """
         try:
             text, speaker = (
                 query[: query.rindex("|")],
@@ -78,10 +86,34 @@ class BarkTextToSpeechTool(GradioTool):
         return self.client.submit(text, speaker, fn_index=3)
 
     def postprocess(self, output: str) -> str:
+        """
+        Postprocess the output.
+
+        :param output: The output to be postprocessed.
+        :type output: str
+        :return: The postprocessed output.
+        :rtype: str
+        """
         return output
 
     def _block_input(self, gr) -> "gr.components.Component":
+        """
+        Create an input block.
+
+        :param gr: The Gradio instance.
+        :type gr: Gradio
+        :return: The input block.
+        :rtype: gr.components.Component
+        """
         return gr.Textbox()
 
     def _block_output(self, gr) -> "gr.components.Component":
+        """
+        Create an output block.
+
+        :param gr: The Gradio instance.
+        :type gr: Gradio
+        :return: The output block.
+        :rtype: gr.components.Component
+        """
         return gr.Audio()
